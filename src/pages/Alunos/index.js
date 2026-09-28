@@ -109,10 +109,12 @@ export default function Alunos() {
                 <input 
                     type="text" 
                     placeholder="Filtrar por nome..." 
+                    aria-label="Filtrar por nome do aluno"
                     value={nomeFiltro}
                     onChange={(e) => setNomeFiltro(e.target.value)}
                 />
                 <select 
+                    aria-label="Filtrar por situação do aluno"
                     value={situacaoFiltro} 
                     onChange={(e) => setSituacaoFiltro(e.target.value)}
                 >
@@ -155,21 +157,21 @@ export default function Alunos() {
                                 <Link to={`/historico/${aluno.id}`} title="Ver Histórico Escolar" style={{ marginLeft: '10px', color: '#17a2b8' }}>
                                     Histórico
                                 </Link>
-                                <Link to={`/aluno/${aluno.id}/edit`} style={{ marginLeft: '10px' }}>
+                                <Link to={`/aluno/${aluno.id}/edit`} style={{ marginLeft: '10px' }} aria-label={`Editar aluno ${aluno.nome}`}>
                                     <FaEdit size={16}/>
                                 </Link>
-                                <Link onClick={handleDeleteAsk} to={`/aluno/${aluno.id}/delete`}>
+                                <Link onClick={handleDeleteAsk} to={`/aluno/${aluno.id}/delete`} aria-label={`Solicitar exclusão do aluno ${aluno.nome}`}>
                                     <FaWindowClose size={16} />
                                 </Link>
 
-                                <FaExclamation 
-                                    size={16} 
-                                    display="none" 
-                                    cursor="pointer"
-                                    onClick={
-                                        e => handleDelete(e, aluno.id, index)
-                                    }
-                                />
+                                <button 
+                                    className="delete-btn-invisible"
+                                    aria-label={`Confirmar exclusão do aluno ${aluno.nome}`}
+                                    style={{ display: 'none', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                                    onClick={e => handleDelete(e, aluno.id, index)}
+                                >
+                                    <FaExclamation size={16} color="red" />
+                                </button>
                             </>
                         )}
                     </div>
