@@ -45,7 +45,10 @@ export default function Alunos() {
             setIsLoading(false);
         } catch(err) {
             const status = get(err, 'response.status', []);
-            if(status == 401) {
+            
+            if (err.customError) {
+                toast.error(err.customError.mensagem);
+            } else if(status === 401) {
                 toast.error('Você precisa fazer login');
             } else {
                 toast.error('Ocorreu um erro ao excluir aluno');
@@ -64,6 +67,9 @@ export default function Alunos() {
             <NovoAluno to="/aluno/">Novo aluno</NovoAluno>
 
             <AlunoContainer>
+                {alunos.length === 0 && !isLoading && (
+                    <p style={{ marginTop: '20px' }}>Nenhum aluno cadastrado.</p>
+                )}
                 {alunos.map((aluno, index) => (
                     <div key={String(aluno.id)}>
                         <ProfilePicture>

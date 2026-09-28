@@ -19,7 +19,11 @@ function* loginRequest({ payload }) {
 
         history.push(payload.prevPath);
     } catch (e) {
-        toast.error('Usuário ou senha inválidos')
+        if (e.customError) {
+            toast.error(e.customError.mensagem);
+        } else {
+            toast.error('Ocorreu um erro ao fazer login');
+        }
 
         yield put(actions.loginFailure());
     }
@@ -54,19 +58,22 @@ function* registerRequest({ payload }) {
             history.push('/login');
         }
     } catch (e) {
-        const errors = get(e, 'response.data.errors', []);
-        const status = get(e, 'response.status', '');
+        if (e.customError) {
+            const { mensagem, detalhes } = e.customError;
+            if (detalhes && detalhes.length > 0) {
+                detalhes.forEach(detalhe => toast.error(`${detalhe.campo}: ${detalhe.mensagem}`));
+            } else {
+                toast.error(mensagem);
+            }
+        } else {
+            toast.error('Erro desconhecido');
+        }
 
+        const status = get(e, 'response.status', '');
         if(status === 401) {
             toast.error('Você precisa fazer login novamente');
             yield put(actions.loginFailure());
             return history.push('/login');
-        }
-
-        if(errors.length > 0) {
-            errors.map(error => toast.error(error));
-        } else {
-            toast.error('Erro desconhecido');
         }
 
         yield put(actions.registerFailure());
