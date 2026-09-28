@@ -28,3 +28,47 @@ export const NovoAluno = styled(Link)`
     display: block;
     padding: 20px 0 10px 0;
 `;
+
+export const FiltersContainer = styled.form`
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    align-items: center;
+
+    input, select {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    button {
+        padding: 8px 16px;
+    }
+
+    button.clear-btn {
+        background: #ccc;
+        color: #333;
+    }
+`;
+
+export const PaginationContainer = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+
+    button {
+        padding: 8px 16px;
+    }
+
+    button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+
+    span {
+        font-weight: bold;
+    }
+`;
