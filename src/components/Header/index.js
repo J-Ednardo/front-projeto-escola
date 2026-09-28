@@ -25,9 +25,14 @@ export default function Header() {
             </Link>
 
             {perfil === 'ADMIN' && (
+                <>
                 <Link to="/disciplinas" title="Disciplinas">
                     <FaBook size={24}/>                
                 </Link>
+                <Link to="/periodos" title="Períodos Letivos" style={{marginLeft: '15px'}}>
+                    Semestres
+                </Link>
+                </>
             )}
 
             {(perfil === 'ADMIN' || perfil === 'PROFESSOR') && (
@@ -39,6 +44,12 @@ export default function Header() {
             <Link to="/register" title="Perfil">
                 <FaUserAlt size={24}/>                
             </Link>
+
+            {perfil === 'ALUNO' && (
+                <Link to={`/historico/${useSelector(state => state.auth.user?.aluno_id)}`} title="Meu Histórico" style={{marginLeft: '15px', color: '#fff'}}>
+                    <FaBook size={24}/> Meu Histórico
+                </Link>
+            )}
             
             {isLoggedIn ? (
                 <Link onClick={handleLogout} to="/logout" title="Sair">

@@ -152,7 +152,10 @@ export default function Alunos() {
                                 <Link to={`/boletim/${aluno.id}`} title="Ver Boletim" style={{ marginLeft: '10px' }}>
                                     Boletim
                                 </Link>
-                                <Link to={`/aluno/${aluno.id}/edit`}>
+                                <Link to={`/historico/${aluno.id}`} title="Ver Histórico Escolar" style={{ marginLeft: '10px', color: '#17a2b8' }}>
+                                    Histórico
+                                </Link>
+                                <Link to={`/aluno/${aluno.id}/edit`} style={{ marginLeft: '10px' }}>
                                     <FaEdit size={16}/>
                                 </Link>
                                 <Link onClick={handleDeleteAsk} to={`/aluno/${aluno.id}/delete`}>
