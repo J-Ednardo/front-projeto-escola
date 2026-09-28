@@ -13,6 +13,7 @@ import Boletim from '../pages/Boletim';
 import Disciplinas from '../pages/Disciplinas';
 import Turmas from '../pages/Turmas';
 import DiarioTurma from '../pages/DiarioTurma';
+import Chamada from '../pages/Chamada';
 
 export default function Routes () {
     return (
@@ -26,6 +27,7 @@ export default function Routes () {
             <MyRoute exact path="/disciplinas" component={Disciplinas} isClosed allowedRoles={['ADMIN']} />
             <MyRoute exact path="/turmas" component={Turmas} isClosed allowedRoles={['ADMIN', 'PROFESSOR']} />
             <MyRoute exact path="/turmas/:id/matriculas" component={DiarioTurma} isClosed allowedRoles={['ADMIN', 'PROFESSOR']} />
+            <MyRoute exact path="/turmas/:id/chamada" component={Chamada} isClosed allowedRoles={['ADMIN', 'PROFESSOR']} />
 
             <MyRoute exact path="/login/" component={Login} isClosed={false} />
             <MyRoute exact path="/register/" component={Register} isClosed={false} />
