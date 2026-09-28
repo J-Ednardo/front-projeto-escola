@@ -24,7 +24,6 @@ export const Nav = styled.nav`
         }
     }
 
-    /* Logo area */
     .logo {
         color: ${colors.primary};
         font-size: 32px;
