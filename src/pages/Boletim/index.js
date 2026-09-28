@@ -99,8 +99,18 @@ export default function Boletim() {
                     {matriculas.map(m => {
                         const faltasCalc = (m.faltas_legado || 0) + (m.Frequencias ? m.Frequencias.filter(f => !f.presente).length : 0);
                         const reprovado = m.situacao === 'Reprovado por falta' || m.situacao === 'Reprovado por nota';
+                        const recuperacao = m.situacao === 'Em Recuperação';
+                        
+                        let bgColor = 'inherit';
+                        if (reprovado) bgColor = '#ffe6e6'; // Vermelho claro
+                        if (recuperacao) bgColor = '#fff3cd'; // Amarelo/Laranja claro
+                        
+                        let textColor = 'inherit';
+                        if (reprovado) textColor = 'red';
+                        if (recuperacao) textColor = '#856404';
+
                         return (
-                            <tr key={m.id} style={{ backgroundColor: reprovado ? '#ffe6e6' : 'inherit' }}>
+                            <tr key={m.id} style={{ backgroundColor: bgColor }}>
                                 <td>{m.Turma?.Disciplina?.nome || 'N/A'}</td>
                                 <td>{m.Turma?.codigo || 'N/A'}</td>
                                 <td>{faltasCalc}</td>
@@ -109,7 +119,7 @@ export default function Boletim() {
                                 <td>{m.nota3 ?? '-'}</td>
                                 <td>{m.nota_recuperacao ?? '-'}</td>
                                 <td>{m.media_final ?? '-'}</td>
-                                <td style={{ fontWeight: reprovado ? 'bold' : 'normal', color: reprovado ? 'red' : 'inherit' }}>
+                                <td style={{ fontWeight: (reprovado || recuperacao) ? 'bold' : 'normal', color: textColor }}>
                                     {m.situacao || '-'}
                                 </td>
                             </tr>
