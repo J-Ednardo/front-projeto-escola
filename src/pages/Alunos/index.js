@@ -120,6 +120,7 @@ export default function Alunos() {
                     <option value="Aprovado">Aprovado</option>
                     <option value="Reprovado por nota">Reprovado por nota</option>
                     <option value="Reprovado por falta">Reprovado por falta</option>
+                    <option value="Em Recuperação">Em Recuperação</option>
                 </select>
                 <button type="submit">Buscar</button>
                 <button type="button" className="clear-btn" onClick={handleClearFilters}>Limpar</button>

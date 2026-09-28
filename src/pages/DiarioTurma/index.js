@@ -97,8 +97,18 @@ export default function DiarioTurma() {
                     {matriculas.map(m => {
                         const faltasCalc = (m.faltas_legado || 0) + (m.Frequencias ? m.Frequencias.filter(f => !f.presente).length : 0);
                         const reprovado = m.situacao === 'Reprovado por falta' || m.situacao === 'Reprovado por nota';
+                        const recuperacao = m.situacao === 'Em Recuperação';
+                        
+                        let bgColor = 'inherit';
+                        if (reprovado) bgColor = '#ffe6e6'; // Vermelho claro
+                        if (recuperacao) bgColor = '#fff3cd'; // Amarelo/Laranja claro
+                        
+                        let textColor = 'inherit';
+                        if (reprovado) textColor = 'red';
+                        if (recuperacao) textColor = '#856404';
+
                         return (
-                        <tr key={m.id} style={{ backgroundColor: reprovado ? '#ffe6e6' : 'inherit' }}>
+                        <tr key={m.id} style={{ backgroundColor: bgColor }}>
                             <td style={{ padding: '10px', border: '1px solid #ccc' }}>#{m.id} (Aluno {m.aluno_id})</td>
                             <td style={{ padding: '10px', border: '1px solid #ccc', color: reprovado ? 'red' : 'inherit', fontWeight: 'bold' }}>
                                 {faltasCalc}
@@ -113,10 +123,17 @@ export default function DiarioTurma() {
                                 <input type="number" defaultValue={m.nota3} onBlur={e => handleSalvarNota(m.id, 'nota3', e.target.value)} style={{ width: '60px' }} />
                             </td>
                             <td style={{ padding: '10px', border: '1px solid #ccc' }}>
-                                <input type="number" defaultValue={m.nota_recuperacao} onBlur={e => handleSalvarNota(m.id, 'nota_recuperacao', e.target.value)} style={{ width: '60px' }} />
+                                <input 
+                                    type="number" 
+                                    defaultValue={m.nota_recuperacao} 
+                                    onBlur={e => handleSalvarNota(m.id, 'nota_recuperacao', e.target.value)} 
+                                    style={{ width: '60px' }} 
+                                    disabled={!recuperacao && m.nota_recuperacao === null} 
+                                    title={!recuperacao && m.nota_recuperacao === null ? "Aluno não está em recuperação" : ""}
+                                />
                             </td>
                             <td style={{ padding: '10px', border: '1px solid #ccc' }}>{m.media_final}</td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc', color: reprovado ? 'red' : 'inherit', fontWeight: reprovado ? 'bold' : 'normal' }}>
+                            <td style={{ padding: '10px', border: '1px solid #ccc', color: textColor, fontWeight: (reprovado || recuperacao) ? 'bold' : 'normal' }}>
                                 {m.situacao}
                             </td>
                         </tr>
