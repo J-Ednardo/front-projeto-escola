@@ -44,13 +44,15 @@ export default function Boletim() {
         doc.setFontSize(18);
         doc.text(`Boletim Escolar - ${aluno.nome} ${aluno.sobrenome}`, 14, 22);
         
-        const tableColumn = ["Disciplina", "Turma", "N1", "N2", "N3", "Rec", "Média", "Situação"];
+        const tableColumn = ["Disciplina", "Turma", "Faltas", "N1", "N2", "N3", "Rec", "Média", "Situação"];
         const tableRows = [];
 
         matriculas.forEach(m => {
+            const faltasCalc = (m.faltas_legado || 0) + (m.Frequencias ? m.Frequencias.filter(f => !f.presente).length : 0);
             const data = [
                 m.Turma?.Disciplina?.nome || 'N/A',
                 m.Turma?.codigo || 'N/A',
+                faltasCalc,
                 m.nota1 ?? '-',
                 m.nota2 ?? '-',
                 m.nota3 ?? '-',
@@ -84,6 +86,7 @@ export default function Boletim() {
                     <tr>
                         <th>Disciplina</th>
                         <th>Turma</th>
+                        <th>Faltas</th>
                         <th>N1</th>
                         <th>N2</th>
                         <th>N3</th>
@@ -93,21 +96,28 @@ export default function Boletim() {
                     </tr>
                 </thead>
                 <tbody>
-                    {matriculas.map(m => (
-                        <tr key={m.id}>
-                            <td>{m.Turma?.Disciplina?.nome || 'N/A'}</td>
-                            <td>{m.Turma?.codigo || 'N/A'}</td>
-                            <td>{m.nota1 ?? '-'}</td>
-                            <td>{m.nota2 ?? '-'}</td>
-                            <td>{m.nota3 ?? '-'}</td>
-                            <td>{m.nota_recuperacao ?? '-'}</td>
-                            <td>{m.media_final ?? '-'}</td>
-                            <td>{m.situacao || '-'}</td>
-                        </tr>
-                    ))}
+                    {matriculas.map(m => {
+                        const faltasCalc = (m.faltas_legado || 0) + (m.Frequencias ? m.Frequencias.filter(f => !f.presente).length : 0);
+                        const reprovado = m.situacao === 'Reprovado por falta' || m.situacao === 'Reprovado por nota';
+                        return (
+                            <tr key={m.id} style={{ backgroundColor: reprovado ? '#ffe6e6' : 'inherit' }}>
+                                <td>{m.Turma?.Disciplina?.nome || 'N/A'}</td>
+                                <td>{m.Turma?.codigo || 'N/A'}</td>
+                                <td>{faltasCalc}</td>
+                                <td>{m.nota1 ?? '-'}</td>
+                                <td>{m.nota2 ?? '-'}</td>
+                                <td>{m.nota3 ?? '-'}</td>
+                                <td>{m.nota_recuperacao ?? '-'}</td>
+                                <td>{m.media_final ?? '-'}</td>
+                                <td style={{ fontWeight: reprovado ? 'bold' : 'normal', color: reprovado ? 'red' : 'inherit' }}>
+                                    {m.situacao || '-'}
+                                </td>
+                            </tr>
+                        );
+                    })}
                     {matriculas.length === 0 && (
                         <tr>
-                            <td colSpan="8" style={{textAlign: 'center'}}>Nenhuma matrícula encontrada.</td>
+                            <td colSpan="9" style={{textAlign: 'center'}}>Nenhuma matrícula encontrada.</td>
                         </tr>
                     )}
                 </tbody>

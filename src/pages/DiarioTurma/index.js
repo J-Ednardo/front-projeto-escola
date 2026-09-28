@@ -65,7 +65,12 @@ export default function DiarioTurma() {
     return (
         <Container>
             <Loading isLoading={isLoading} />
-            <h1>Diário da Turma {id}</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h1>Diário da Turma {id}</h1>
+                <Link to={`/turmas/${id}/chamada`} style={{ padding: '10px 15px', background: '#007bff', color: '#fff', textDecoration: 'none', borderRadius: '4px' }}>
+                    Fazer Chamada
+                </Link>
+            </div>
 
             <form onSubmit={handleMatricular} style={{ display: 'flex', gap: '10px', marginTop: '20px', marginBottom: '20px' }}>
                 <select value={alunoId} onChange={e => setAlunoId(e.target.value)} required>
@@ -79,6 +84,7 @@ export default function DiarioTurma() {
                 <thead>
                     <tr style={{ background: '#eee' }}>
                         <th style={{ padding: '10px', border: '1px solid #ccc' }}>Matrícula ID</th>
+                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>Faltas</th>
                         <th style={{ padding: '10px', border: '1px solid #ccc' }}>N1</th>
                         <th style={{ padding: '10px', border: '1px solid #ccc' }}>N2</th>
                         <th style={{ padding: '10px', border: '1px solid #ccc' }}>N3</th>
@@ -88,9 +94,15 @@ export default function DiarioTurma() {
                     </tr>
                 </thead>
                 <tbody>
-                    {matriculas.map(m => (
-                        <tr key={m.id}>
+                    {matriculas.map(m => {
+                        const faltasCalc = (m.faltas_legado || 0) + (m.Frequencias ? m.Frequencias.filter(f => !f.presente).length : 0);
+                        const reprovado = m.situacao === 'Reprovado por falta' || m.situacao === 'Reprovado por nota';
+                        return (
+                        <tr key={m.id} style={{ backgroundColor: reprovado ? '#ffe6e6' : 'inherit' }}>
                             <td style={{ padding: '10px', border: '1px solid #ccc' }}>#{m.id} (Aluno {m.aluno_id})</td>
+                            <td style={{ padding: '10px', border: '1px solid #ccc', color: reprovado ? 'red' : 'inherit', fontWeight: 'bold' }}>
+                                {faltasCalc}
+                            </td>
                             <td style={{ padding: '10px', border: '1px solid #ccc' }}>
                                 <input type="number" defaultValue={m.nota1} onBlur={e => handleSalvarNota(m.id, 'nota1', e.target.value)} style={{ width: '60px' }} />
                             </td>
@@ -104,9 +116,12 @@ export default function DiarioTurma() {
                                 <input type="number" defaultValue={m.nota_recuperacao} onBlur={e => handleSalvarNota(m.id, 'nota_recuperacao', e.target.value)} style={{ width: '60px' }} />
                             </td>
                             <td style={{ padding: '10px', border: '1px solid #ccc' }}>{m.media_final}</td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc' }}>{m.situacao}</td>
+                            <td style={{ padding: '10px', border: '1px solid #ccc', color: reprovado ? 'red' : 'inherit', fontWeight: reprovado ? 'bold' : 'normal' }}>
+                                {m.situacao}
+                            </td>
                         </tr>
-                    ))}
+                        )
+                    })}
                 </tbody>
             </table>
         </Container>
