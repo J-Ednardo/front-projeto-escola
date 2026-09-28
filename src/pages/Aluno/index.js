@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { isEmail, isInt } from 'validator';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { FaEdit, FaUserCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
@@ -17,6 +17,7 @@ import * as actions from '../../store/modules/auth/actions';
 
 export default function Aluno({ match }) {
     const dispatch = useDispatch();
+    const perfil = useSelector(state => state.auth.user?.perfil);
     const id =  get(match, 'params.id', '');
     const [nome, setNome] = useState('');
     const [sobrenome, setSobrenome] = useState('');
@@ -137,9 +138,11 @@ export default function Aluno({ match }) {
                     ) : (
                         <FaUserCircle size={180} />
                     )}
-                    <Link to={`/fotos/${id}`}>
-                        <FaEdit size={24} />
-                    </Link>
+                    {perfil !== 'ALUNO' && (
+                        <Link to={`/fotos/${id}`}>
+                            <FaEdit size={24} />
+                        </Link>
+                    )}
                 </ProfilePicture>
             )}
             <Form onSubmit={handleSubmit}>
@@ -150,6 +153,7 @@ export default function Aluno({ match }) {
                         value={nome}
                         onChange={e => setNome(e.target.value)}
                         placeholder='Nome'
+                        disabled={perfil === 'ALUNO'}
                     />
                 </label>
 
@@ -160,6 +164,7 @@ export default function Aluno({ match }) {
                         value={sobrenome}
                         onChange={e => setSobrenome(e.target.value)}
                         placeholder='Sobrenome'
+                        disabled={perfil === 'ALUNO'}
                     />
                 </label>
 
@@ -170,6 +175,7 @@ export default function Aluno({ match }) {
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         placeholder='E-mail'
+                        disabled={perfil === 'ALUNO'}
                     />
                 </label>
 
@@ -180,10 +186,13 @@ export default function Aluno({ match }) {
                         value={idade}
                         onChange={e => setIdade(e.target.value)}
                         placeholder='Idade'
+                        disabled={perfil === 'ALUNO'}
                     />
                 </label>
 
-                <button type="submit">{id ? 'Editar Aluno' : 'Cadastrar Aluno'}</button>
+                {perfil !== 'ALUNO' && (
+                    <button type="submit">{id ? 'Editar Aluno' : 'Cadastrar Aluno'}</button>
+                )}
             </Form>
         </Container>
     );

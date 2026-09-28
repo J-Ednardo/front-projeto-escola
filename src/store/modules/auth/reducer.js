@@ -5,7 +5,11 @@ const initialState = {
     isLoggedIn: false,
     token: false,
     user: {
-        
+        id: '',
+        nome: '',
+        email: '',
+        perfil: '',
+        aluno_id: null
     },
     isLoading: false,
 };
