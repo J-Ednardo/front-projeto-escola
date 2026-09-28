@@ -3,8 +3,9 @@ import { Route, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 
-export default function MyRoute({ component: Component, isClosed, ...rest }) {
+export default function MyRoute({ component: Component, isClosed, allowedRoles, ...rest }) {
     const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
+    const user = useSelector(state => state.auth.user);
 
     if(isClosed && !isLoggedIn) {
         return (
@@ -15,6 +16,17 @@ export default function MyRoute({ component: Component, isClosed, ...rest }) {
                 }}
             />
         );
+    }
+
+    if (allowedRoles && isLoggedIn) {
+        if (!allowedRoles.includes(user.perfil)) {
+            // Se for ALUNO tentando acessar rota que não pode, joga pra edição dele
+            if (user.perfil === 'ALUNO' && user.aluno_id) {
+                return <Redirect to={`/aluno/${user.aluno_id}/edit`} />;
+            }
+            // Fallback genérico para quem não tem acesso
+            return <Redirect to="/" />;
+        }
     }
 
     return <Route {...rest } component={Component} />;

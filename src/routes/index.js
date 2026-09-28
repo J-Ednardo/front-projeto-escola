@@ -13,10 +13,10 @@ import Register from '../pages/Register';
 export default function Routes () {
     return (
         <Switch>
-            <MyRoute exact path="/" component={Alunos} isClosed={false} />
+            <MyRoute exact path="/" component={Alunos} isClosed allowedRoles={['ADMIN', 'PROFESSOR']} />
             <MyRoute exact path="/aluno/:id/edit" component={Aluno} isClosed />
-            <MyRoute exact path="/aluno/" component={Aluno} isClosed />
-            <MyRoute exact path="/fotos/:id" component={Fotos} isClosed />           
+            <MyRoute exact path="/aluno/" component={Aluno} isClosed allowedRoles={['ADMIN', 'PROFESSOR']} />
+            <MyRoute exact path="/fotos/:id" component={Fotos} isClosed allowedRoles={['ADMIN', 'PROFESSOR']} />           
             <MyRoute exact path="/login/" component={Login} isClosed={false} />
             <MyRoute exact path="/register/" component={Register} isClosed={false} />
             <MyRoute component={Page404}/>

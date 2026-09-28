@@ -16,8 +16,18 @@ function* loginRequest({ payload }) {
         toast.success('Você fez login');
 
         axios.defaults.headers.Authorization = `Bearer ${response.data.token}`;
-
-        history.push(payload.prevPath);
+        
+        const { perfil, aluno_id } = response.data.user;
+        if (perfil === 'ALUNO') {
+            if (aluno_id) {
+                history.push(`/aluno/${aluno_id}/edit`);
+            } else {
+                toast.error('Seu usuário não possui um aluno vinculado.');
+                history.push('/'); // Ou desloga, mas vamos mandar pro root que vai deslogar por rota restrita ou mostrar tela branca
+            }
+        } else {
+            history.push(payload.prevPath || '/');
+        }
     } catch (e) {
         if (e.customError) {
             toast.error(e.customError.mensagem);
