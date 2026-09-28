@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { colors, metrics } from '../../styles/theme';
 
 export const AlunoContainer = styled.div`
     margin-top: 20px;
@@ -8,47 +9,63 @@ export const AlunoContainer = styled.div`
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 5px 0;
+        padding: 15px 0;
     }
 
-    div + div{
-        border-top: 1px solid #eee;
+    div + div {
+        border-top: 1px solid ${colors.border};
     }
 `;
 
 export const ProfilePicture = styled.div`
     img {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
+        object-fit: cover;
     }
 `;
 
 export const NovoAluno = styled(Link)`
-    display: block;
-    padding: 20px 0 10px 0;
+    display: inline-block;
+    background: ${colors.success};
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: ${metrics.borderRadius};
+    font-weight: 600;
+    margin: 20px 0;
+    transition: all 0.3s;
+
+    &:hover {
+        filter: brightness(90%);
+        color: #fff;
+    }
 `;
 
 export const FiltersContainer = styled.form`
     display: flex;
-    gap: 10px;
+    gap: 15px;
     margin-top: 20px;
     margin-bottom: 20px;
     align-items: center;
 
     input, select {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
+        padding: 12px;
+        border: 1px solid ${colors.border};
+        border-radius: 8px;
+        font-family: inherit;
+        background: #fdfdfd;
+        flex: 1;
     }
 
     button {
-        padding: 8px 16px;
+        padding: 12px 24px;
+        border-radius: 8px;
     }
 
     button.clear-btn {
-        background: #ccc;
-        color: #333;
+        background: #E8E9ED;
+        color: ${colors.textTitle};
     }
 `;
 
@@ -57,18 +74,21 @@ export const PaginationContainer = styled.div`
     align-items: center;
     justify-content: center;
     gap: 15px;
-    margin-top: 20px;
+    margin-top: 30px;
 
     button {
         padding: 8px 16px;
+        border-radius: 8px;
     }
 
     button:disabled {
-        background: #ccc;
+        background: ${colors.border};
+        color: ${colors.textBody};
         cursor: not-allowed;
     }
 
     span {
-        font-weight: bold;
+        font-weight: 600;
+        color: ${colors.textBody};
     }
 `;

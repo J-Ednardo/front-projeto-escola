@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaHome, FaSignInAlt, FaUserAlt, FaCircle, FaPowerOff, FaBook, FaUsers } from 'react-icons/fa';
+import { FaHome, FaSignInAlt, FaUserAlt, FaCircle, FaPowerOff, FaBook, FaUsers, FaGraduationCap } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -19,49 +19,55 @@ export default function Header() {
     }
 
     return (
-        <Nav>
-            <Link to="/" title="Início">
+        <Nav aria-label="Sidebar">
+            <Link to="/" className="logo" title="Início">
+                <FaGraduationCap size={32}/>
+            </Link>
+
+            <Link to="/" title="Início" aria-label="Início">
                 <FaHome size={24}/>
             </Link>
 
             {perfil === 'ADMIN' && (
                 <>
-                <Link to="/disciplinas" title="Disciplinas">
+                <Link to="/disciplinas" title="Disciplinas" aria-label="Disciplinas">
                     <FaBook size={24}/>                
                 </Link>
-                <Link to="/periodos" title="Períodos Letivos" style={{marginLeft: '15px'}}>
-                    Semestres
+                <Link to="/periodos" title="Períodos Letivos" aria-label="Períodos Letivos">
+                    <FaBook size={24}/>
                 </Link>
                 </>
             )}
 
             {(perfil === 'ADMIN' || perfil === 'PROFESSOR') && (
-                <Link to="/turmas" title="Turmas">
+                <Link to="/turmas" title="Turmas" aria-label="Turmas">
                     <FaUsers size={24}/>                
                 </Link>
             )}
 
-            <Link to="/register" title="Perfil">
+            <Link to="/register" title="Perfil" aria-label="Perfil">
                 <FaUserAlt size={24}/>                
             </Link>
 
             {perfil === 'ALUNO' && (
-                <Link to={`/historico/${useSelector(state => state.auth.user?.aluno_id)}`} title="Meu Histórico" style={{marginLeft: '15px', color: '#fff'}}>
-                    <FaBook size={24}/> Meu Histórico
+                <Link to={`/historico/${useSelector(state => state.auth.user?.aluno_id)}`} title="Meu Histórico" aria-label="Meu Histórico">
+                    <FaBook size={24}/>
                 </Link>
             )}
             
+            <div style={{ flex: 1 }}></div>
+
             {isLoggedIn ? (
-                <Link onClick={handleLogout} to="/logout" title="Sair">
+                <Link onClick={handleLogout} to="/logout" title="Sair" aria-label="Sair">
                     <FaPowerOff size={24}/>
                 </Link>
             ): (
-                <Link to="/login" title="Entrar">
+                <Link to="/login" title="Entrar" aria-label="Entrar">
                     <FaSignInAlt size={24}/>
                 </Link>
             )}
 
-            {isLoggedIn &&  <FaCircle size={24} color='#66ff33' />}
+            {isLoggedIn &&  <FaCircle size={12} color='#00B894' style={{ marginBottom: '20px' }} />}
         </Nav>
     );
 }

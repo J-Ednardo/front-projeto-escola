@@ -1,16 +1,33 @@
 import styled from 'styled-components';
-import { primaryColor } from '../../config/colors';
+import { colors, metrics } from '../../styles/theme';
 
 export const Nav = styled.nav`
-    background: ${primaryColor};
-    padding: 20px;
+    background: ${colors.sidebarBg};
+    width: ${metrics.sidebarWidth};
+    height: 100vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    padding: 30px 0;
+    position: sticky;
+    top: 0;
 
     a {
-        color: #fff;
-        margin: 0 10px 0;
-        font-weight: bold;
+        color: ${colors.sidebarIcon};
+        margin-bottom: 30px;
+        font-size: 24px;
+        transition: all 0.3s;
+        
+        &:hover {
+            color: ${colors.sidebarIconActive};
+            transform: scale(1.1);
+        }
+    }
+
+    /* Logo area */
+    .logo {
+        color: ${colors.primary};
+        font-size: 32px;
+        margin-bottom: 60px;
     }
 `;
