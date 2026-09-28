@@ -3,7 +3,7 @@ import { colors, metrics } from './theme';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default createGlobalStyle`
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
     * {
         margin: 0;
@@ -13,7 +13,7 @@ export default createGlobalStyle`
     }
 
     body {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Plus Jakarta Sans', sans-serif;
         background: ${colors.background};
         color: ${colors.textTitle};
         -webkit-font-smoothing: antialiased;
