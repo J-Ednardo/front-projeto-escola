@@ -6,9 +6,9 @@ export default function Loading({ isLoading }) {
     if(!isLoading) return <></>;
 
     return (
-        <Container>
+        <Container role="status" aria-live="polite">
             <div />
-            <span>Carregando...</span>
+            <span className="sr-only">Carregando...</span>
         </Container>
     );
 }

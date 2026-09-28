@@ -59,12 +59,12 @@ export default function Turmas() {
             <h1>Turmas</h1>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px', marginTop: '20px', marginBottom: '20px' }}>
-                <input type="text" placeholder="Código" value={codigo} onChange={e => setCodigo(e.target.value)} required />
-                <select value={disciplinaId} onChange={e => setDisciplinaId(e.target.value)} required>
+                <input type="text" placeholder="Código" aria-label="Código da Turma" value={codigo} onChange={e => setCodigo(e.target.value)} required />
+                <select aria-label="Disciplina da Turma" value={disciplinaId} onChange={e => setDisciplinaId(e.target.value)} required>
                     <option value="">Disciplina</option>
                     {disciplinas.map(d => <option key={d.id} value={d.id}>{d.nome}</option>)}
                 </select>
-                <select value={periodoId} onChange={e => setPeriodoId(e.target.value)} required>
+                <select aria-label="Período da Turma" value={periodoId} onChange={e => setPeriodoId(e.target.value)} required>
                     <option value="">Período</option>
                     {periodos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
                 </select>
@@ -75,7 +75,7 @@ export default function Turmas() {
                 {turmas.map(t => (
                     <li key={t.id} style={{ padding: '10px', borderBottom: '1px solid #ccc', display: 'flex', justifyContent: 'space-between' }}>
                         <span>Turma: {t.codigo} (Disc: {t.disciplina_id} / Período: {t.periodo_id})</span>
-                        <Link to={`/turmas/${t.id}/matriculas`}>Ver Diário</Link>
+                        <Link to={`/turmas/${t.id}/matriculas`} aria-label={`Ver diário da turma ${t.codigo}`}>Ver Diário</Link>
                     </li>
                 ))}
             </ul>
