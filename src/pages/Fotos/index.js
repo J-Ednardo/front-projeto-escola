@@ -59,10 +59,20 @@ export default function Fotos({ match }) {
             setIsLoading(false);
         } catch (err) {
             setIsLoading(false);
-            const status = get(err, 'response', '');
-            toast.error('Erro ao enviar foto')
+            const status = get(err, 'response.status', 0);
+            
+            if (err.customError) {
+                const { mensagem, detalhes } = err.customError;
+                if (detalhes && detalhes.length > 0) {
+                    detalhes.forEach(detalhe => toast.error(`${detalhe.campo}: ${detalhe.mensagem}`));
+                } else {
+                    toast.error(mensagem);
+                }
+            } else {
+                toast.error('Erro ao enviar foto');
+            }
 
-            if(status === 401) dispatch(actions.loginFailure);
+            if(status === 401) dispatch(actions.loginFailure());
         }
     };
 

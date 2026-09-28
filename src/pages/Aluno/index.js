@@ -43,9 +43,11 @@ export default function Aluno({ match }) {
             } catch (err) {
                 setIsLoading(false);
                 const status = get(err, 'response.status', 0);
-                const errors = get(err, 'response.data.errors', []);
 
-                if(status == 400) errors.map(error => toast.error(error));
+                if (err.customError) {
+                    toast.error(err.customError.mensagem);
+                }
+                
                 history.push('/');
             }
         }
@@ -107,12 +109,14 @@ export default function Aluno({ match }) {
         } catch (err) {
             setIsLoading(false);
             const status = get(err, 'response.status', 0);
-            const data = get(err, 'response.data', {});
-            const errors = get(data, 'errors', []);
             
-
-            if(errors.length > 0) {
-                errors.map(error => toast.error(error));
+            if (err.customError) {
+                const { mensagem, detalhes } = err.customError;
+                if (detalhes && detalhes.length > 0) {
+                    detalhes.forEach(detalhe => toast.error(`${detalhe.campo}: ${detalhe.mensagem}`));
+                } else {
+                    toast.error(mensagem);
+                }
             } else {
                 toast.error('Erro desconhecido');
             }
