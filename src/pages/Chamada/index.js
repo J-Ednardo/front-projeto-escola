@@ -12,30 +12,35 @@ export default function Chamada() {
     const [dataAula, setDataAula] = useState(new Date().toISOString().split('T')[0]);
     const [conteudo, setConteudo] = useState('');
     const [presencas, setPresencas] = useState({}); // { matricula_id: true/false }
+    const [turma, setTurma] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         async function getData() {
             try {
                 setIsLoading(true);
-                // Carrega alunos matriculados na turma
-                const resMat = await axios.get('/matriculas');
+                const [resMat, resTurma] = await Promise.all([
+                    axios.get('/matriculas'),
+                    axios.get(`/turmas/${id}`)
+                ]);
                 const turmMat = resMat.data.filter(m => String(m.turma_id) === String(id));
                 setMatriculas(turmMat);
                 
-                // Inicializa todo mundo como presente
                 const pres = {};
                 turmMat.forEach(m => pres[m.id] = true);
                 setPresencas(pres);
+                setTurma(resTurma.data);
 
                 setIsLoading(false);
             } catch(e) {
                 setIsLoading(false);
-                toast.error('Erro ao carregar matrículas para chamada');
+                toast.error('Erro ao carregar dados para chamada');
             }
         }
         getData();
     }, [id]);
+
+    const isFechado = turma?.PeriodoLetivo?.status === 'FECHADO';
 
     const handleToggle = (matriculaId) => {
         setPresencas({
@@ -81,15 +86,21 @@ export default function Chamada() {
             <Loading isLoading={isLoading} />
             <h1>Fazer Chamada - Turma {id}</h1>
 
+            {isFechado && (
+                <div style={{ background: '#f8d7da', color: '#721c24', padding: '15px', borderRadius: '4px', marginTop: '15px', fontWeight: 'bold' }}>
+                    🔒 Este semestre está encerrado e arquivado. Edições bloqueadas.
+                </div>
+            )}
+
             <form onSubmit={handleSalvarChamada} style={{ marginTop: '20px' }}>
                 <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
                     <div style={{ flex: 1 }}>
                         <label>Data da Aula</label>
-                        <input type="date" value={dataAula} onChange={e => setDataAula(e.target.value)} required style={{ width: '100%', padding: '8px' }} />
+                        <input type="date" value={dataAula} onChange={e => setDataAula(e.target.value)} disabled={isFechado} required style={{ width: '100%', padding: '8px', background: isFechado ? '#e9ecef' : '#fff' }} />
                     </div>
                     <div style={{ flex: 3 }}>
                         <label>Conteúdo Ministrado</label>
-                        <input type="text" value={conteudo} onChange={e => setConteudo(e.target.value)} required style={{ width: '100%', padding: '8px' }} />
+                        <input type="text" value={conteudo} onChange={e => setConteudo(e.target.value)} disabled={isFechado} required style={{ width: '100%', padding: '8px', background: isFechado ? '#e9ecef' : '#fff' }} />
                     </div>
                 </div>
 
@@ -109,6 +120,7 @@ export default function Chamada() {
                                 <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center' }}>
                                     <button 
                                         type="button"
+                                        disabled={isFechado}
                                         onClick={() => handleToggle(m.id)}
                                         style={{ 
                                             background: presencas[m.id] ? '#28a745' : '#dc3545', 
@@ -116,7 +128,8 @@ export default function Chamada() {
                                             padding: '8px 15px', 
                                             border: 'none', 
                                             borderRadius: '4px',
-                                            cursor: 'pointer',
+                                            cursor: isFechado ? 'not-allowed' : 'pointer',
+                                            opacity: isFechado ? 0.6 : 1,
                                             width: '100%'
                                         }}
                                     >
@@ -129,7 +142,7 @@ export default function Chamada() {
                 </table>
 
                 {matriculas.length > 0 ? (
-                    <button type="submit" style={{ width: '100%', padding: '15px', background: '#007bff', color: '#fff', fontSize: '16px' }}>
+                    <button type="submit" disabled={isFechado} style={{ width: '100%', padding: '15px', background: '#007bff', color: '#fff', fontSize: '16px', cursor: isFechado ? 'not-allowed' : 'pointer', opacity: isFechado ? 0.6 : 1 }}>
                         Salvar Lote de Chamada
                     </button>
                 ) : (

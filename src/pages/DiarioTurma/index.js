@@ -10,6 +10,7 @@ export default function DiarioTurma() {
     const { id } = useParams(); // turma_id
     const [matriculas, setMatriculas] = useState([]);
     const [alunos, setAlunos] = useState([]);
+    const [turma, setTurma] = useState(null);
     const [alunoId, setAlunoId] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -23,6 +24,10 @@ export default function DiarioTurma() {
 
                 const resAlunos = await axios.get('/alunos');
                 setAlunos(get(resAlunos.data, 'data', []));
+
+                const resTurma = await axios.get(`/turmas/${id}`);
+                setTurma(resTurma.data);
+
                 setIsLoading(false);
             } catch(e) {
                 setIsLoading(false);
@@ -31,6 +36,8 @@ export default function DiarioTurma() {
         }
         getData();
     }, [id]);
+
+    const isFechado = turma?.PeriodoLetivo?.status === 'FECHADO';
 
     const handleMatricular = async (e) => {
         e.preventDefault();
@@ -72,12 +79,18 @@ export default function DiarioTurma() {
                 </Link>
             </div>
 
+            {isFechado && (
+                <div style={{ background: '#f8d7da', color: '#721c24', padding: '15px', borderRadius: '4px', marginTop: '15px', fontWeight: 'bold' }}>
+                    🔒 Este semestre está encerrado e arquivado. Edições bloqueadas.
+                </div>
+            )}
+
             <form onSubmit={handleMatricular} style={{ display: 'flex', gap: '10px', marginTop: '20px', marginBottom: '20px' }}>
-                <select value={alunoId} onChange={e => setAlunoId(e.target.value)} required>
+                <select value={alunoId} onChange={e => setAlunoId(e.target.value)} required disabled={isFechado} style={{ background: isFechado ? '#e9ecef' : '#fff' }}>
                     <option value="">Selecione o Aluno</option>
                     {alunos.map(a => <option key={a.id} value={a.id}>{a.nome} {a.sobrenome}</option>)}
                 </select>
-                <button type="submit">Matricular</button>
+                <button type="submit" disabled={isFechado} style={{ opacity: isFechado ? 0.6 : 1, cursor: isFechado ? 'not-allowed' : 'pointer' }}>Matricular</button>
             </form>
 
             <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
@@ -114,22 +127,22 @@ export default function DiarioTurma() {
                                 {faltasCalc}
                             </td>
                             <td style={{ padding: '10px', border: '1px solid #ccc' }}>
-                                <input type="number" defaultValue={m.nota1} onBlur={e => handleSalvarNota(m.id, 'nota1', e.target.value)} style={{ width: '60px' }} />
+                                <input type="number" defaultValue={m.nota1} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota1', e.target.value)} style={{ width: '60px', background: isFechado ? '#e9ecef' : '#fff' }} />
                             </td>
                             <td style={{ padding: '10px', border: '1px solid #ccc' }}>
-                                <input type="number" defaultValue={m.nota2} onBlur={e => handleSalvarNota(m.id, 'nota2', e.target.value)} style={{ width: '60px' }} />
+                                <input type="number" defaultValue={m.nota2} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota2', e.target.value)} style={{ width: '60px', background: isFechado ? '#e9ecef' : '#fff' }} />
                             </td>
                             <td style={{ padding: '10px', border: '1px solid #ccc' }}>
-                                <input type="number" defaultValue={m.nota3} onBlur={e => handleSalvarNota(m.id, 'nota3', e.target.value)} style={{ width: '60px' }} />
+                                <input type="number" defaultValue={m.nota3} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota3', e.target.value)} style={{ width: '60px', background: isFechado ? '#e9ecef' : '#fff' }} />
                             </td>
                             <td style={{ padding: '10px', border: '1px solid #ccc' }}>
                                 <input 
                                     type="number" 
                                     defaultValue={m.nota_recuperacao} 
                                     onBlur={e => handleSalvarNota(m.id, 'nota_recuperacao', e.target.value)} 
-                                    style={{ width: '60px' }} 
-                                    disabled={!recuperacao && m.nota_recuperacao === null} 
-                                    title={!recuperacao && m.nota_recuperacao === null ? "Aluno não está em recuperação" : ""}
+                                    style={{ width: '60px', background: (isFechado || (!recuperacao && m.nota_recuperacao === null)) ? '#e9ecef' : '#fff' }} 
+                                    disabled={isFechado || (!recuperacao && m.nota_recuperacao === null)} 
+                                    title={isFechado ? "Semestre encerrado" : (!recuperacao && m.nota_recuperacao === null ? "Aluno não está em recuperação" : "")}
                                 />
                             </td>
                             <td style={{ padding: '10px', border: '1px solid #ccc' }}>{m.media_final}</td>
