@@ -148,6 +148,9 @@ export default function Alunos() {
 
                         {perfil !== 'ALUNO' && (
                             <>
+                                <Link to={`/boletim/${aluno.id}`} title="Ver Boletim" style={{ marginLeft: '10px' }}>
+                                    Boletim
+                                </Link>
                                 <Link to={`/aluno/${aluno.id}/edit`}>
                                     <FaEdit size={16}/>
                                 </Link>

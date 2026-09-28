@@ -22,7 +22,7 @@ export default function MyRoute({ component: Component, isClosed, allowedRoles, 
         if (!allowedRoles.includes(user.perfil)) {
             // Se for ALUNO tentando acessar rota que não pode, joga pra edição dele
             if (user.perfil === 'ALUNO' && user.aluno_id) {
-                return <Redirect to={`/aluno/${user.aluno_id}/edit`} />;
+                return <Redirect to={`/boletim`} />;
             }
             // Fallback genérico para quem não tem acesso
             return <Redirect to="/" />;
