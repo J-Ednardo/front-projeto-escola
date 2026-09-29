@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { get } from 'lodash';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
@@ -74,36 +74,36 @@ export default function DiarioTurma() {
             <Loading isLoading={isLoading} />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h1>Diário da Turma {id}</h1>
-                <Link to={`/turmas/${id}/chamada`} style={{ padding: '10px 15px', background: '#007bff', color: '#fff', textDecoration: 'none', borderRadius: '4px' }}>
+                <Link to={`/turmas/${id}/chamada`} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: '#6C5CE7', color: '#fff', padding: '0 20px', height: '40px', borderRadius: '12px', fontSize: '14px', fontWeight: 600 }}>
                     Fazer Chamada
                 </Link>
             </div>
 
             {isFechado && (
-                <div style={{ background: '#f8d7da', color: '#721c24', padding: '15px', borderRadius: '4px', marginTop: '15px', fontWeight: 'bold' }}>
-                    🔒 Este semestre está encerrado e arquivado. Edições bloqueadas.
+                <div style={{ background: '#FFEAA7', color: '#D35400', padding: '16px', borderRadius: '12px', marginTop: '15px', fontWeight: 'bold' }}>
+                    Este semestre esta encerrado e arquivado. Edicoes bloqueadas.
                 </div>
             )}
 
-            <form onSubmit={handleMatricular} style={{ display: 'flex', gap: '10px', marginTop: '20px', marginBottom: '20px' }}>
-                <select value={alunoId} onChange={e => setAlunoId(e.target.value)} required disabled={isFechado} style={{ background: isFechado ? '#e9ecef' : '#fff' }}>
+            <form onSubmit={handleMatricular} style={{ display: 'flex', gap: '15px', marginTop: '20px', marginBottom: '20px' }}>
+                <select value={alunoId} onChange={e => setAlunoId(e.target.value)} required disabled={isFechado} style={{ flex: 1 }}>
                     <option value="">Selecione o Aluno</option>
                     {alunos.map(a => <option key={a.id} value={a.id}>{a.nome} {a.sobrenome}</option>)}
                 </select>
-                <button type="submit" disabled={isFechado} style={{ opacity: isFechado ? 0.6 : 1, cursor: isFechado ? 'not-allowed' : 'pointer' }}>Matricular</button>
+                <button type="submit" disabled={isFechado}>Matricular</button>
             </form>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+            <table>
                 <thead>
-                    <tr style={{ background: '#eee' }}>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>Matrícula ID</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>Faltas</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>N1</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>N2</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>N3</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>Recuperação</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>Média</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>Situação</th>
+                    <tr>
+                        <th>Matrícula ID</th>
+                        <th>Faltas</th>
+                        <th>N1</th>
+                        <th>N2</th>
+                        <th>N3</th>
+                        <th>Recuperação</th>
+                        <th>Média</th>
+                        <th>Situação</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -113,8 +113,8 @@ export default function DiarioTurma() {
                         const recuperacao = m.situacao === 'Em Recuperação';
                         
                         let bgColor = 'inherit';
-                        if (reprovado) bgColor = '#ffe6e6'; // Vermelho claro
-                        if (recuperacao) bgColor = '#fff3cd'; // Amarelo/Laranja claro
+                        if (reprovado) bgColor = '#ffe6e6';
+                        if (recuperacao) bgColor = '#fff3cd';
                         
                         let textColor = 'inherit';
                         if (reprovado) textColor = 'red';
@@ -122,31 +122,31 @@ export default function DiarioTurma() {
 
                         return (
                         <tr key={m.id} style={{ backgroundColor: bgColor }}>
-                            <td style={{ padding: '10px', border: '1px solid #ccc' }}>#{m.id} (Aluno {m.aluno_id})</td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc', color: reprovado ? 'red' : 'inherit', fontWeight: 'bold' }}>
+                            <td>#{m.id} (Aluno {m.aluno_id})</td>
+                            <td style={{ color: reprovado ? 'red' : 'inherit', fontWeight: 'bold' }}>
                                 {faltasCalc}
                             </td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc' }}>
-                                <input type="number" defaultValue={m.nota1} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota1', e.target.value)} style={{ width: '60px', background: isFechado ? '#e9ecef' : '#fff' }} />
+                            <td>
+                                <input type="number" defaultValue={m.nota1} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota1', e.target.value)} style={{ width: '80px', padding: '0 8px', height: '40px' }} />
                             </td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc' }}>
-                                <input type="number" defaultValue={m.nota2} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota2', e.target.value)} style={{ width: '60px', background: isFechado ? '#e9ecef' : '#fff' }} />
+                            <td>
+                                <input type="number" defaultValue={m.nota2} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota2', e.target.value)} style={{ width: '80px', padding: '0 8px', height: '40px' }} />
                             </td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc' }}>
-                                <input type="number" defaultValue={m.nota3} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota3', e.target.value)} style={{ width: '60px', background: isFechado ? '#e9ecef' : '#fff' }} />
+                            <td>
+                                <input type="number" defaultValue={m.nota3} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota3', e.target.value)} style={{ width: '80px', padding: '0 8px', height: '40px' }} />
                             </td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc' }}>
+                            <td>
                                 <input 
                                     type="number" 
                                     defaultValue={m.nota_recuperacao} 
                                     onBlur={e => handleSalvarNota(m.id, 'nota_recuperacao', e.target.value)} 
-                                    style={{ width: '60px', background: (isFechado || (!recuperacao && m.nota_recuperacao === null)) ? '#e9ecef' : '#fff' }} 
+                                    style={{ width: '80px', padding: '0 8px', height: '40px' }} 
                                     disabled={isFechado || (!recuperacao && m.nota_recuperacao === null)} 
                                     title={isFechado ? "Semestre encerrado" : (!recuperacao && m.nota_recuperacao === null ? "Aluno não está em recuperação" : "")}
                                 />
                             </td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc' }}>{m.media_final}</td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc', color: textColor, fontWeight: (reprovado || recuperacao) ? 'bold' : 'normal' }}>
+                            <td>{m.media_final}</td>
+                            <td style={{ color: textColor, fontWeight: (reprovado || recuperacao) ? 'bold' : 'normal' }}>
                                 {m.situacao}
                             </td>
                         </tr>

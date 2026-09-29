@@ -1,27 +1,21 @@
 import styled from 'styled-components';
-import * as colors from '../../config/colors';
+import { colors } from '../../styles/theme';
 
 export const Form = styled.form`
     display: flex;
     flex-direction: column;
-    margin-top: 20px;
+    margin-top: 30px;
 
     label {
         display: flex;
         flex-direction: column;
         margin-bottom: 20px;
+        font-weight: 500;
+        font-size: 14px;
+        color: ${colors.textBody};
     }
 
     input {
-        height: 40px;
-        font-size: 18px;
-        border: 1px solid #ddd;
-        padding: 0 10px;
-        border-radius: 4px;
-        margin-top: 5px;
-
-        &:focus {
-            border: 1px solid ${colors.primaryColor};
-        }
+        margin-top: 8px;
     }
 `;

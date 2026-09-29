@@ -1,28 +1,22 @@
 import styled from 'styled-components';
-import * as colors from '../../config/colors';
+import { colors } from '../../styles/theme';
 
 export const Form = styled.form`
     display: flex;
     flex-direction: column;
-    margin-top: 20px;
+    margin-top: 30px;
 
     label {
         display: flex;
         flex-direction: column;
         margin-bottom: 20px;
+        font-weight: 500;
+        font-size: 14px;
+        color: ${colors.textBody};
     }
 
     input {
-        height: 40px;
-        font-size: 18px;
-        border: 1px solid #ddd;
-        padding: 0 10px;
-        border-radius: 4px;
-        margin-top: 5px;
-
-        &:focus {
-            border: 1px solid ${colors.primaryColor};
-        }
+        margin-top: 8px;
     }
 `;
 
@@ -38,6 +32,8 @@ export const ProfilePicture = styled.div`
         width: 180px;
         height: 180px;
         border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid ${colors.border};
     }
 
     a {
@@ -48,9 +44,15 @@ export const ProfilePicture = styled.div`
         position: absolute;
         bottom: 0;
         color: #fff;
-        background: ${colors.primaryColor};
-        width: 36px;
-        height: 36px;
+        background: ${colors.primary};
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
+        transition: all 0.3s;
+
+        &:hover {
+            transform: scale(1.1);
+            color: #fff;
+        }
     }
 `;

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
@@ -31,13 +31,20 @@ export default function Periodos() {
         e.preventDefault();
         try {
             setIsLoading(true);
-            const { data } = await axios.post('/periodos-letivos', { ano, semestre });
+            const nome = `${ano}.${semestre}`;
+            const { data } = await axios.post('/periodos-letivos', { nome });
             setPeriodos([...periodos, data]);
             toast.success('Período criado com sucesso!');
+            setAno('');
+            setSemestre('');
             setIsLoading(false);
         } catch(e) {
             setIsLoading(false);
-            toast.error('Erro ao criar período letivo');
+            if (e.customError) {
+                toast.error(e.customError.mensagem);
+            } else {
+                toast.error('Erro ao criar período letivo');
+            }
         }
     };
 
@@ -57,7 +64,11 @@ export default function Periodos() {
             setIsLoading(false);
         } catch(e) {
             setIsLoading(false);
-            toast.error('Erro ao mudar status do período');
+            if (e.customError) {
+                toast.error(e.customError.mensagem);
+            } else {
+                toast.error('Erro ao mudar status do período');
+            }
         }
     };
 
@@ -66,39 +77,39 @@ export default function Periodos() {
             <Loading isLoading={isLoading} />
             <h1>Gestão de Semestres</h1>
 
-            <form onSubmit={handleCreate} style={{ display: 'flex', gap: '10px', marginTop: '20px', marginBottom: '30px' }}>
-                <input type="number" placeholder="Ano (ex: 2026)" value={ano} onChange={e => setAno(e.target.value)} required />
-                <input type="number" placeholder="Semestre (1 ou 2)" value={semestre} onChange={e => setSemestre(e.target.value)} required />
+            <form onSubmit={handleCreate} style={{ display: 'flex', gap: '15px', marginTop: '20px', marginBottom: '30px' }}>
+                <input type="number" placeholder="Ano (ex: 2026)" value={ano} onChange={e => setAno(e.target.value)} required style={{ flex: 1 }} />
+                <input type="number" placeholder="Semestre (1 ou 2)" value={semestre} onChange={e => setSemestre(e.target.value)} required min="1" max="2" style={{ flex: 1 }} />
                 <button type="submit">Criar Semestre</button>
             </form>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table>
                 <thead>
-                    <tr style={{ background: '#eee' }}>
-                        <th style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center' }}>Período Letivo</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center' }}>Status</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center' }}>Ação</th>
+                    <tr>
+                        <th>Período Letivo</th>
+                        <th>Status</th>
+                        <th>Ação</th>
                     </tr>
                 </thead>
                 <tbody>
                     {periodos.map(p => (
                         <tr key={p.id}>
-                            <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center' }}>{p.ano}.{p.semestre}</td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center', fontWeight: 'bold', color: p.status === 'ABERTO' ? 'green' : 'red' }}>
+                            <td>{p.nome}</td>
+                            <td style={{ fontWeight: 'bold', color: p.status === 'ABERTO' ? '#00B894' : '#D63031' }}>
                                 {p.status}
                             </td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center' }}>
+                            <td>
                                 <button 
                                     onClick={() => handleToggleStatus(p.id, p.status)}
-                                    style={{ padding: '5px 10px', background: p.status === 'ABERTO' ? '#dc3545' : '#28a745', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                                    style={{ background: p.status === 'ABERTO' ? '#d63031' : '#00b894', height: '40px', padding: '0 16px', fontSize: '13px', margin: 'auto' }}
                                 >
-                                    {p.status === 'ABERTO' ? '🔒 Encerrar' : '🔓 Reabrir'}
+                                    {p.status === 'ABERTO' ? 'Encerrar' : 'Reabrir'}
                                 </button>
                             </td>
                         </tr>
                     ))}
                     {periodos.length === 0 && (
-                        <tr><td colSpan="3" style={{ textAlign: 'center', padding: '10px' }}>Nenhum semestre cadastrado.</td></tr>
+                        <tr><td colSpan="3" style={{ textAlign: 'center' }}>Nenhum semestre cadastrado.</td></tr>
                     )}
                 </tbody>
             </table>

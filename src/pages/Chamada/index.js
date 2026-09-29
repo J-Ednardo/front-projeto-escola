@@ -15,13 +15,16 @@ export default function Chamada() {
     const [turma, setTurma] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
+    const [aulas, setAulas] = useState([]);
+
     useEffect(() => {
         async function getData() {
             try {
                 setIsLoading(true);
-                const [resMat, resTurma] = await Promise.all([
+                const [resMat, resTurma, resAulas] = await Promise.all([
                     axios.get('/matriculas'),
-                    axios.get(`/turmas/${id}`)
+                    axios.get(`/turmas/${id}`),
+                    axios.get(`/turmas/${id}/aulas`)
                 ]);
                 const turmMat = resMat.data.filter(m => String(m.turma_id) === String(id));
                 setMatriculas(turmMat);
@@ -30,11 +33,16 @@ export default function Chamada() {
                 turmMat.forEach(m => pres[m.id] = true);
                 setPresencas(pres);
                 setTurma(resTurma.data);
+                setAulas(resAulas.data);
 
                 setIsLoading(false);
             } catch(e) {
                 setIsLoading(false);
-                toast.error('Erro ao carregar dados para chamada');
+                if (e.customError) {
+                    toast.error(e.customError.mensagem);
+                } else {
+                    toast.error('Erro ao carregar dados para chamada');
+                }
             }
         }
         getData();
@@ -88,7 +96,7 @@ export default function Chamada() {
 
             {isFechado && (
                 <div style={{ background: '#f8d7da', color: '#721c24', padding: '15px', borderRadius: '4px', marginTop: '15px', fontWeight: 'bold' }}>
-                    🔒 Este semestre está encerrado e arquivado. Edições bloqueadas.
+                    Este semestre esta encerrado e arquivado. Edicoes bloqueadas.
                 </div>
             )}
 
@@ -104,33 +112,30 @@ export default function Chamada() {
                     </div>
                 </div>
 
-                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
+                <table style={{ marginBottom: '20px' }}>
                     <thead>
-                        <tr style={{ background: '#eee' }}>
-                            <th style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'left' }}>Aluno (Matrícula ID)</th>
-                            <th style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center', width: '150px' }}>Presença</th>
+                        <tr>
+                            <th>Aluno (Matrícula ID)</th>
+                            <th style={{ textAlign: 'center', width: '150px' }}>Presença</th>
                         </tr>
                     </thead>
                     <tbody>
                         {matriculas.map(m => (
                             <tr key={m.id} style={{ backgroundColor: presencas[m.id] ? 'inherit' : '#ffe6e6' }}>
-                                <td style={{ padding: '10px', border: '1px solid #ccc' }}>
+                                <td>
                                     {m.Aluno?.nome} {m.Aluno?.sobrenome} (Matrícula #{m.id})
                                 </td>
-                                <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center' }}>
+                                <td style={{ textAlign: 'center' }}>
                                     <button 
                                         type="button"
                                         disabled={isFechado}
                                         onClick={() => handleToggle(m.id)}
                                         style={{ 
-                                            background: presencas[m.id] ? '#28a745' : '#dc3545', 
-                                            color: '#fff', 
-                                            padding: '8px 15px', 
-                                            border: 'none', 
-                                            borderRadius: '4px',
-                                            cursor: isFechado ? 'not-allowed' : 'pointer',
-                                            opacity: isFechado ? 0.6 : 1,
-                                            width: '100%'
+                                            background: presencas[m.id] ? '#00b894' : '#d63031', 
+                                            height: '40px',
+                                            padding: '0 16px',
+                                            width: '100%',
+                                            opacity: isFechado ? 0.6 : 1
                                         }}
                                     >
                                         {presencas[m.id] ? 'Presente' : 'Falta'}
@@ -149,6 +154,28 @@ export default function Chamada() {
                     <p>Nenhum aluno matriculado nesta turma.</p>
                 )}
             </form>
+
+            {aulas.length > 0 && (
+                <div style={{ marginTop: '40px' }}>
+                    <h2>Aulas Ministradas</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Conteúdo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {aulas.map(a => (
+                                <tr key={a.id}>
+                                    <td>{a.data}</td>
+                                    <td>{a.conteudo}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </Container>
     );
 }

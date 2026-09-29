@@ -49,7 +49,11 @@ export default function Turmas() {
             setIsLoading(false);
         } catch(e) {
             setIsLoading(false);
-            toast.error('Erro ao cadastrar turma');
+            if (e.customError) {
+                toast.error(e.customError.mensagem);
+            } else {
+                toast.error('Erro ao cadastrar turma');
+            }
         }
     };
 
@@ -58,13 +62,13 @@ export default function Turmas() {
             <Loading isLoading={isLoading} />
             <h1>Turmas</h1>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px', marginTop: '20px', marginBottom: '20px' }}>
-                <input type="text" placeholder="Código" aria-label="Código da Turma" value={codigo} onChange={e => setCodigo(e.target.value)} required />
-                <select aria-label="Disciplina da Turma" value={disciplinaId} onChange={e => setDisciplinaId(e.target.value)} required>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '15px', marginTop: '20px', marginBottom: '20px' }}>
+                <input type="text" placeholder="Código" aria-label="Código da Turma" value={codigo} onChange={e => setCodigo(e.target.value)} required style={{ flex: 1 }} />
+                <select aria-label="Disciplina da Turma" value={disciplinaId} onChange={e => setDisciplinaId(e.target.value)} required style={{ flex: 1 }}>
                     <option value="">Disciplina</option>
                     {disciplinas.map(d => <option key={d.id} value={d.id}>{d.nome}</option>)}
                 </select>
-                <select aria-label="Período da Turma" value={periodoId} onChange={e => setPeriodoId(e.target.value)} required>
+                <select aria-label="Período da Turma" value={periodoId} onChange={e => setPeriodoId(e.target.value)} required style={{ flex: 1 }}>
                     <option value="">Período</option>
                     {periodos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
                 </select>
@@ -73,9 +77,9 @@ export default function Turmas() {
 
             <ul>
                 {turmas.map(t => (
-                    <li key={t.id} style={{ padding: '10px', borderBottom: '1px solid #ccc', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>Turma: {t.codigo} (Disc: {t.disciplina_id} / Período: {t.periodo_id})</span>
-                        <Link to={`/turmas/${t.id}/matriculas`} aria-label={`Ver diário da turma ${t.codigo}`}>Ver Diário</Link>
+                    <li key={t.id} style={{ padding: '16px 0', borderBottom: '1px solid #E8E9ED', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 500, color: '#2D3436' }}>Turma: {t.codigo} (Disc: {t.disciplina_id} / Período: {t.periodo_id})</span>
+                        <Link to={`/turmas/${t.id}/matriculas`} aria-label={`Ver diário da turma ${t.codigo}`} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: '#6C5CE7', color: '#fff', padding: '0 20px', height: '40px', borderRadius: '12px', fontSize: '14px', fontWeight: 600 }}>Ver Diário</Link>
                     </li>
                 ))}
             </ul>

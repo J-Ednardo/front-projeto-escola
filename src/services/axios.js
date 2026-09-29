@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import { toast } from 'react-toastify';
+
 const api = axios.create({
     baseURL: 'http://localhost:3005',
 });
@@ -7,8 +9,9 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Se a API retornou o nosso padrão de AppError/ZodError
-    if (error.response && error.response.data && error.response.data.erro) {
+    if (error.response && error.response.status === 429) {
+        toast.error('Muitas requisições. Aguarde um momento e tente novamente.');
+    } else if (error.response && error.response.data && error.response.data.erro) {
       const { codigo, mensagem, detalhes } = error.response.data.erro;
       error.customError = { codigo, mensagem, detalhes };
     }
