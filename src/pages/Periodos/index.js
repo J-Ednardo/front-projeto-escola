@@ -31,9 +31,12 @@ export default function Periodos() {
         e.preventDefault();
         try {
             setIsLoading(true);
-            const { data } = await axios.post('/periodos-letivos', { ano, semestre });
+            const nome = `${ano}.${semestre}`;
+            const { data } = await axios.post('/periodos-letivos', { nome });
             setPeriodos([...periodos, data]);
             toast.success('Período criado com sucesso!');
+            setAno('');
+            setSemestre('');
             setIsLoading(false);
         } catch(e) {
             setIsLoading(false);
@@ -68,7 +71,7 @@ export default function Periodos() {
 
             <form onSubmit={handleCreate} style={{ display: 'flex', gap: '15px', marginTop: '20px', marginBottom: '30px' }}>
                 <input type="number" placeholder="Ano (ex: 2026)" value={ano} onChange={e => setAno(e.target.value)} required style={{ flex: 1 }} />
-                <input type="number" placeholder="Semestre (1 ou 2)" value={semestre} onChange={e => setSemestre(e.target.value)} required style={{ flex: 1 }} />
+                <input type="number" placeholder="Semestre (1 ou 2)" value={semestre} onChange={e => setSemestre(e.target.value)} required min="1" max="2" style={{ flex: 1 }} />
                 <button type="submit">Criar Semestre</button>
             </form>
 
@@ -83,7 +86,7 @@ export default function Periodos() {
                 <tbody>
                     {periodos.map(p => (
                         <tr key={p.id}>
-                            <td>{p.ano}.{p.semestre}</td>
+                            <td>{p.nome}</td>
                             <td style={{ fontWeight: 'bold', color: p.status === 'ABERTO' ? '#00B894' : '#D63031' }}>
                                 {p.status}
                             </td>
