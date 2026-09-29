@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
@@ -92,7 +92,7 @@ export default function Periodos() {
                                     onClick={() => handleToggleStatus(p.id, p.status)}
                                     style={{ padding: '5px 10px', background: p.status === 'ABERTO' ? '#dc3545' : '#28a745', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                                 >
-                                    {p.status === 'ABERTO' ? '🔒 Encerrar' : '🔓 Reabrir'}
+                                    {p.status === 'ABERTO' ? 'Encerrar' : 'Reabrir'}
                                 </button>
                             </td>
                         </tr>

@@ -88,7 +88,7 @@ export default function Chamada() {
 
             {isFechado && (
                 <div style={{ background: '#f8d7da', color: '#721c24', padding: '15px', borderRadius: '4px', marginTop: '15px', fontWeight: 'bold' }}>
-                    🔒 Este semestre está encerrado e arquivado. Edições bloqueadas.
+                    Este semestre esta encerrado e arquivado. Edicoes bloqueadas.
                 </div>
             )}
 
