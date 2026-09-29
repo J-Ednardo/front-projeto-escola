@@ -14,9 +14,12 @@ describe('Usuarios Page', () => {
 
     it('deve carregar e renderizar a lista de usuários', async () => {
         axios.get.mockResolvedValueOnce({
-            data: [
-                { id: 1, nome: 'Admin Test', email: 'admin@test.com', perfil: 'ADMIN', aluno_id: null }
-            ]
+            data: {
+                data: [
+                    { id: 1, nome: 'Admin Test', email: 'admin@test.com', perfil: 'ADMIN', aluno_id: null }
+                ],
+                meta: { totalPages: 1 }
+            }
         });
 
         render(

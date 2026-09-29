@@ -14,12 +14,17 @@ export default function Usuarios() {
     const [perfil, setPerfil] = useState('');
     const [alunoId, setAlunoId] = useState('');
 
+    // Pagination
+    const [page, setPage] = useState(1);
+    const [meta, setMeta] = useState({ totalPages: 1 });
+
     useEffect(() => {
         async function getData() {
             try {
                 setIsLoading(true);
-                const { data } = await axios.get('/users');
-                setUsuarios(data);
+                const { data } = await axios.get('/users', { params: { page, limit: 10 } });
+                setUsuarios(data.data || []);
+                setMeta(data.meta || { totalPages: 1 });
                 setIsLoading(false);
             } catch(e) {
                 setIsLoading(false);
@@ -27,7 +32,7 @@ export default function Usuarios() {
             }
         }
         getData();
-    }, []);
+    }, [page]);
 
     const handleEditClick = (user) => {
         setEditingUserId(user.id);
@@ -127,6 +132,26 @@ export default function Usuarios() {
                     ))}
                 </tbody>
             </table>
+
+            {meta.totalPages > 1 && (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px', marginTop: '20px' }}>
+                    <button 
+                        onClick={() => setPage(page - 1)} 
+                        disabled={page === 1}
+                        style={{ padding: '8px 16px', background: page === 1 ? '#ccc' : '#6C5CE7', color: '#fff' }}
+                    >
+                        Anterior
+                    </button>
+                    <span>Página {page} de {meta.totalPages}</span>
+                    <button 
+                        onClick={() => setPage(page + 1)} 
+                        disabled={page === meta.totalPages}
+                        style={{ padding: '8px 16px', background: page === meta.totalPages ? '#ccc' : '#6C5CE7', color: '#fff' }}
+                    >
+                        Próximo
+                    </button>
+                </div>
+            )}
         </Container>
     );
 }
