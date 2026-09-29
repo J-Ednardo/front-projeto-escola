@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
@@ -46,9 +46,9 @@ export default function Disciplinas() {
             <Loading isLoading={isLoading} />
             <h1>Disciplinas</h1>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px', marginTop: '20px', marginBottom: '20px' }}>
-                <input type="text" placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} required />
-                <input type="number" placeholder="Carga horária" value={carga} onChange={e => setCarga(e.target.value)} required />
+            <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '15px', marginTop: '20px', marginBottom: '20px' }}>
+                <input type="text" placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} required style={{ flex: 1 }} />
+                <input type="number" placeholder="Carga horária" value={carga} onChange={e => setCarga(e.target.value)} required style={{ flex: 1 }} />
                 <button type="submit">Cadastrar</button>
             </form>
 

@@ -27,18 +27,23 @@ export const ProfilePicture = styled.div`
 `;
 
 export const NovoAluno = styled(Link)`
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: ${colors.success};
     color: #fff;
-    padding: 10px 20px;
-    border-radius: ${metrics.borderRadius};
+    padding: 0 24px;
+    height: 48px;
+    border-radius: 12px;
     font-weight: 600;
+    font-size: 15px;
     margin: 20px 0;
     transition: all 0.3s;
 
     &:hover {
         filter: brightness(90%);
         color: #fff;
+        transform: translateY(-1px);
     }
 `;
 
@@ -50,11 +55,6 @@ export const FiltersContainer = styled.form`
     align-items: center;
 
     input, select {
-        padding: 12px;
-        border: 1px solid ${colors.border};
-        border-radius: 8px;
-        font-family: inherit;
-        background: #fdfdfd;
         flex: 1;
     }
 

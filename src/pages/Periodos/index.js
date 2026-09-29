@@ -66,9 +66,9 @@ export default function Periodos() {
             <Loading isLoading={isLoading} />
             <h1>Gestão de Semestres</h1>
 
-            <form onSubmit={handleCreate} style={{ display: 'flex', gap: '10px', marginTop: '20px', marginBottom: '30px' }}>
-                <input type="number" placeholder="Ano (ex: 2026)" value={ano} onChange={e => setAno(e.target.value)} required />
-                <input type="number" placeholder="Semestre (1 ou 2)" value={semestre} onChange={e => setSemestre(e.target.value)} required />
+            <form onSubmit={handleCreate} style={{ display: 'flex', gap: '15px', marginTop: '20px', marginBottom: '30px' }}>
+                <input type="number" placeholder="Ano (ex: 2026)" value={ano} onChange={e => setAno(e.target.value)} required style={{ flex: 1 }} />
+                <input type="number" placeholder="Semestre (1 ou 2)" value={semestre} onChange={e => setSemestre(e.target.value)} required style={{ flex: 1 }} />
                 <button type="submit">Criar Semestre</button>
             </form>
 
@@ -90,7 +90,7 @@ export default function Periodos() {
                             <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center' }}>
                                 <button 
                                     onClick={() => handleToggleStatus(p.id, p.status)}
-                                    style={{ padding: '5px 10px', background: p.status === 'ABERTO' ? '#dc3545' : '#28a745', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                                    style={{ background: p.status === 'ABERTO' ? '#d63031' : '#00b894', height: '40px', padding: '0 16px', fontSize: '13px', margin: 'auto' }}
                                 >
                                     {p.status === 'ABERTO' ? 'Encerrar' : 'Reabrir'}
                                 </button>

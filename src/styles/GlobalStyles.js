@@ -3,7 +3,7 @@ import { colors, metrics } from './theme';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default createGlobalStyle`
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
     * {
         margin: 0;
@@ -13,7 +13,7 @@ export default createGlobalStyle`
     }
 
     body {
-        font-family: 'DM Sans', sans-serif;
+        font-family: 'Plus Jakarta Sans', sans-serif;
         background: ${colors.background};
         color: ${colors.textTitle};
         -webkit-font-smoothing: antialiased;
@@ -27,19 +27,49 @@ export default createGlobalStyle`
         display: flex;
     }
 
+    input, select {
+        height: 48px;
+        font-size: 15px;
+        font-family: inherit;
+        border: 1px solid ${colors.border};
+        padding: 0 16px;
+        border-radius: 12px;
+        background: #FAFAFA;
+        transition: all 0.3s;
+        color: ${colors.textTitle};
+
+        &:focus {
+            border: 1px solid ${colors.primary};
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+            background: #fff;
+        }
+        
+        &:disabled {
+            background: #E8E9ED;
+            cursor: not-allowed;
+        }
+    }
+
     button {
         cursor: pointer;
         background: ${colors.primary};
         border: none;
         color: #fff;
-        padding: 12px 24px;
-        border-radius: ${metrics.borderRadius};
+        padding: 0 24px;
+        height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
         font-weight: 600;
+        font-size: 15px;
+        font-family: inherit;
         transition: all 300ms;
     }
 
     button:hover {
         filter: brightness(90%);
+        transform: translateY(-1px);
     }
 
     a {

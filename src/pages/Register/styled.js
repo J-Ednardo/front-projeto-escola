@@ -16,19 +16,6 @@ export const Form = styled.form`
     }
 
     input {
-        height: 48px;
-        font-size: 16px;
-        font-family: inherit;
-        border: 1px solid ${colors.border};
-        padding: 0 16px;
-        border-radius: 12px;
         margin-top: 8px;
-        background: #FAFAFA;
-        transition: all 0.3s;
-
-        &:focus {
-            border: 1px solid ${colors.primary};
-            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
-        }
     }
 `;

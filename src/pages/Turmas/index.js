@@ -59,23 +59,23 @@ export default function Turmas() {
             <h1>Turmas</h1>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '15px', marginTop: '20px', marginBottom: '20px' }}>
-                <input type="text" placeholder="Código" aria-label="Código da Turma" value={codigo} onChange={e => setCodigo(e.target.value)} required style={{ padding: '12px', border: '1px solid #E8E9ED', borderRadius: '12px', fontFamily: 'inherit', background: '#FAFAFA', flex: 1 }} />
-                <select aria-label="Disciplina da Turma" value={disciplinaId} onChange={e => setDisciplinaId(e.target.value)} required style={{ padding: '12px', border: '1px solid #E8E9ED', borderRadius: '12px', fontFamily: 'inherit', background: '#FAFAFA', flex: 1 }}>
+                <input type="text" placeholder="Código" aria-label="Código da Turma" value={codigo} onChange={e => setCodigo(e.target.value)} required style={{ flex: 1 }} />
+                <select aria-label="Disciplina da Turma" value={disciplinaId} onChange={e => setDisciplinaId(e.target.value)} required style={{ flex: 1 }}>
                     <option value="">Disciplina</option>
                     {disciplinas.map(d => <option key={d.id} value={d.id}>{d.nome}</option>)}
                 </select>
-                <select aria-label="Período da Turma" value={periodoId} onChange={e => setPeriodoId(e.target.value)} required style={{ padding: '12px', border: '1px solid #E8E9ED', borderRadius: '12px', fontFamily: 'inherit', background: '#FAFAFA', flex: 1 }}>
+                <select aria-label="Período da Turma" value={periodoId} onChange={e => setPeriodoId(e.target.value)} required style={{ flex: 1 }}>
                     <option value="">Período</option>
                     {periodos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
                 </select>
-                <button type="submit" style={{ borderRadius: '12px' }}>Cadastrar</button>
+                <button type="submit">Cadastrar</button>
             </form>
 
             <ul>
                 {turmas.map(t => (
                     <li key={t.id} style={{ padding: '16px 0', borderBottom: '1px solid #E8E9ED', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ fontWeight: 500, color: '#2D3436' }}>Turma: {t.codigo} (Disc: {t.disciplina_id} / Período: {t.periodo_id})</span>
-                        <Link to={`/turmas/${t.id}/matriculas`} aria-label={`Ver diário da turma ${t.codigo}`} style={{ background: '#6C5CE7', color: '#fff', padding: '8px 20px', borderRadius: '12px', fontSize: '14px', fontWeight: 600 }}>Ver Diário</Link>
+                        <Link to={`/turmas/${t.id}/matriculas`} aria-label={`Ver diário da turma ${t.codigo}`} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: '#6C5CE7', color: '#fff', padding: '0 20px', height: '40px', borderRadius: '12px', fontSize: '14px', fontWeight: 600 }}>Ver Diário</Link>
                     </li>
                 ))}
             </ul>
