@@ -104,33 +104,30 @@ export default function Chamada() {
                     </div>
                 </div>
 
-                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
+                <table style={{ marginBottom: '20px' }}>
                     <thead>
-                        <tr style={{ background: '#eee' }}>
-                            <th style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'left' }}>Aluno (Matrícula ID)</th>
-                            <th style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center', width: '150px' }}>Presença</th>
+                        <tr>
+                            <th>Aluno (Matrícula ID)</th>
+                            <th style={{ textAlign: 'center', width: '150px' }}>Presença</th>
                         </tr>
                     </thead>
                     <tbody>
                         {matriculas.map(m => (
                             <tr key={m.id} style={{ backgroundColor: presencas[m.id] ? 'inherit' : '#ffe6e6' }}>
-                                <td style={{ padding: '10px', border: '1px solid #ccc' }}>
+                                <td>
                                     {m.Aluno?.nome} {m.Aluno?.sobrenome} (Matrícula #{m.id})
                                 </td>
-                                <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center' }}>
+                                <td style={{ textAlign: 'center' }}>
                                     <button 
                                         type="button"
                                         disabled={isFechado}
                                         onClick={() => handleToggle(m.id)}
                                         style={{ 
-                                            background: presencas[m.id] ? '#28a745' : '#dc3545', 
-                                            color: '#fff', 
-                                            padding: '8px 15px', 
-                                            border: 'none', 
-                                            borderRadius: '4px',
-                                            cursor: isFechado ? 'not-allowed' : 'pointer',
-                                            opacity: isFechado ? 0.6 : 1,
-                                            width: '100%'
+                                            background: presencas[m.id] ? '#00b894' : '#d63031', 
+                                            height: '40px',
+                                            padding: '0 16px',
+                                            width: '100%',
+                                            opacity: isFechado ? 0.6 : 1
                                         }}
                                     >
                                         {presencas[m.id] ? 'Presente' : 'Falta'}

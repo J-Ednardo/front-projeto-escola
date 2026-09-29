@@ -72,22 +72,22 @@ export default function Periodos() {
                 <button type="submit">Criar Semestre</button>
             </form>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table>
                 <thead>
-                    <tr style={{ background: '#eee' }}>
-                        <th style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center' }}>Período Letivo</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center' }}>Status</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center' }}>Ação</th>
+                    <tr>
+                        <th>Período Letivo</th>
+                        <th>Status</th>
+                        <th>Ação</th>
                     </tr>
                 </thead>
                 <tbody>
                     {periodos.map(p => (
                         <tr key={p.id}>
-                            <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center' }}>{p.ano}.{p.semestre}</td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center', fontWeight: 'bold', color: p.status === 'ABERTO' ? 'green' : 'red' }}>
+                            <td>{p.ano}.{p.semestre}</td>
+                            <td style={{ fontWeight: 'bold', color: p.status === 'ABERTO' ? '#00B894' : '#D63031' }}>
                                 {p.status}
                             </td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center' }}>
+                            <td>
                                 <button 
                                     onClick={() => handleToggleStatus(p.id, p.status)}
                                     style={{ background: p.status === 'ABERTO' ? '#d63031' : '#00b894', height: '40px', padding: '0 16px', fontSize: '13px', margin: 'auto' }}
@@ -98,7 +98,7 @@ export default function Periodos() {
                         </tr>
                     ))}
                     {periodos.length === 0 && (
-                        <tr><td colSpan="3" style={{ textAlign: 'center', padding: '10px' }}>Nenhum semestre cadastrado.</td></tr>
+                        <tr><td colSpan="3" style={{ textAlign: 'center' }}>Nenhum semestre cadastrado.</td></tr>
                     )}
                 </tbody>
             </table>

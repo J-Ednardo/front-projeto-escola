@@ -78,6 +78,50 @@ export default createGlobalStyle`
         transition: all 300ms;
     }
 
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: #fff;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        border: 1px solid #F1F2F6;
+        margin: 20px 0;
+    }
+
+    th {
+        text-align: left;
+        padding: 16px 24px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 700;
+        color: #8F95B2;
+        background: #FAFBFC;
+        border-bottom: 1px solid #F1F2F6;
+    }
+
+    td {
+        padding: 16px 24px;
+        font-size: 14px;
+        color: #2D3436;
+        border-bottom: 1px solid #F1F2F6;
+        vertical-align: middle;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    tbody tr:hover {
+        background: #F8F9FA;
+    }
+
     ul {
         list-style: none;
     }

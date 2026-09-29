@@ -54,24 +54,24 @@ export default function Historico() {
                     <h3 style={{ borderBottom: '2px solid #6C5CE7', paddingBottom: '8px', color: '#2D3436', fontSize: '16px' }}>
                         Período Letivo: {periodo}
                     </h3>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
+                    <table>
                         <thead>
-                            <tr style={{ background: '#F5F6FA' }}>
-                                <th scope="col" style={{ padding: '14px 16px', border: '1px solid #E8E9ED', textAlign: 'left', fontSize: '12px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px', color: '#636E72' }}>Disciplina</th>
-                                <th scope="col" style={{ padding: '14px 16px', border: '1px solid #E8E9ED', textAlign: 'center', fontSize: '12px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px', color: '#636E72' }}>CH</th>
-                                <th scope="col" style={{ padding: '14px 16px', border: '1px solid #E8E9ED', textAlign: 'center', fontSize: '12px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px', color: '#636E72' }}>Média Final</th>
-                                <th scope="col" style={{ padding: '14px 16px', border: '1px solid #E8E9ED', textAlign: 'center', fontSize: '12px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px', color: '#636E72' }}>Faltas</th>
-                                <th scope="col" style={{ padding: '14px 16px', border: '1px solid #E8E9ED', textAlign: 'center', fontSize: '12px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px', color: '#636E72' }}>Situação</th>
+                            <tr>
+                                <th>Disciplina</th>
+                                <th style={{ textAlign: 'center' }}>CH</th>
+                                <th style={{ textAlign: 'center' }}>Média Final</th>
+                                <th style={{ textAlign: 'center' }}>Faltas</th>
+                                <th style={{ textAlign: 'center' }}>Situação</th>
                             </tr>
                         </thead>
                         <tbody>
                             {periodos[periodo].map((m, idx) => (
-                                <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#FAFBFC' }}>
-                                    <td style={{ padding: '14px 16px', border: '1px solid #E8E9ED', fontSize: '14px' }}>{m.disciplina}</td>
-                                    <td style={{ padding: '14px 16px', border: '1px solid #E8E9ED', textAlign: 'center', fontSize: '14px' }}>{m.carga_horaria}h</td>
-                                    <td style={{ padding: '14px 16px', border: '1px solid #E8E9ED', textAlign: 'center', fontWeight: 'bold', fontSize: '14px' }}>{m.media_final ?? '-'}</td>
-                                    <td style={{ padding: '14px 16px', border: '1px solid #E8E9ED', textAlign: 'center', fontSize: '14px' }}>{m.faltas}</td>
-                                    <td style={{ padding: '14px 16px', border: '1px solid #E8E9ED', textAlign: 'center', fontWeight: 'bold', fontSize: '14px', color: m.situacao === 'Aprovado' ? '#00B894' : (m.situacao === 'Em Recuperação' ? '#856404' : '#D63031') }}>
+                                <tr key={idx}>
+                                    <td>{m.disciplina}</td>
+                                    <td style={{ textAlign: 'center' }}>{m.carga_horaria}h</td>
+                                    <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{m.media_final ?? '-'}</td>
+                                    <td style={{ textAlign: 'center' }}>{m.faltas}</td>
+                                    <td style={{ textAlign: 'center', fontWeight: 'bold', color: m.situacao === 'Aprovado' ? '#00B894' : (m.situacao === 'Em Recuperação' ? '#E1B12C' : '#D63031') }}>
                                         {m.situacao || 'Cursando'}
                                     </td>
                                 </tr>

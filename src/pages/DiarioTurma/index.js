@@ -93,17 +93,17 @@ export default function DiarioTurma() {
                 <button type="submit" disabled={isFechado}>Matricular</button>
             </form>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+            <table>
                 <thead>
-                    <tr style={{ background: '#eee' }}>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>Matrícula ID</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>Faltas</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>N1</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>N2</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>N3</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>Recuperação</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>Média</th>
-                        <th style={{ padding: '10px', border: '1px solid #ccc' }}>Situação</th>
+                    <tr>
+                        <th>Matrícula ID</th>
+                        <th>Faltas</th>
+                        <th>N1</th>
+                        <th>N2</th>
+                        <th>N3</th>
+                        <th>Recuperação</th>
+                        <th>Média</th>
+                        <th>Situação</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -113,8 +113,8 @@ export default function DiarioTurma() {
                         const recuperacao = m.situacao === 'Em Recuperação';
                         
                         let bgColor = 'inherit';
-                        if (reprovado) bgColor = '#ffe6e6'; // Vermelho claro
-                        if (recuperacao) bgColor = '#fff3cd'; // Amarelo/Laranja claro
+                        if (reprovado) bgColor = '#ffe6e6';
+                        if (recuperacao) bgColor = '#fff3cd';
                         
                         let textColor = 'inherit';
                         if (reprovado) textColor = 'red';
@@ -122,20 +122,20 @@ export default function DiarioTurma() {
 
                         return (
                         <tr key={m.id} style={{ backgroundColor: bgColor }}>
-                            <td style={{ padding: '10px', border: '1px solid #ccc' }}>#{m.id} (Aluno {m.aluno_id})</td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc', color: reprovado ? 'red' : 'inherit', fontWeight: 'bold' }}>
+                            <td>#{m.id} (Aluno {m.aluno_id})</td>
+                            <td style={{ color: reprovado ? 'red' : 'inherit', fontWeight: 'bold' }}>
                                 {faltasCalc}
                             </td>
-                            <td style={{ padding: '10px', border: '1px solid #E8E9ED' }}>
+                            <td>
                                 <input type="number" defaultValue={m.nota1} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota1', e.target.value)} style={{ width: '80px', padding: '0 8px', height: '40px' }} />
                             </td>
-                            <td style={{ padding: '10px', border: '1px solid #E8E9ED' }}>
+                            <td>
                                 <input type="number" defaultValue={m.nota2} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota2', e.target.value)} style={{ width: '80px', padding: '0 8px', height: '40px' }} />
                             </td>
-                            <td style={{ padding: '10px', border: '1px solid #E8E9ED' }}>
+                            <td>
                                 <input type="number" defaultValue={m.nota3} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota3', e.target.value)} style={{ width: '80px', padding: '0 8px', height: '40px' }} />
                             </td>
-                            <td style={{ padding: '10px', border: '1px solid #E8E9ED' }}>
+                            <td>
                                 <input 
                                     type="number" 
                                     defaultValue={m.nota_recuperacao} 
@@ -145,8 +145,8 @@ export default function DiarioTurma() {
                                     title={isFechado ? "Semestre encerrado" : (!recuperacao && m.nota_recuperacao === null ? "Aluno não está em recuperação" : "")}
                                 />
                             </td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc' }}>{m.media_final}</td>
-                            <td style={{ padding: '10px', border: '1px solid #ccc', color: textColor, fontWeight: (reprovado || recuperacao) ? 'bold' : 'normal' }}>
+                            <td>{m.media_final}</td>
+                            <td style={{ color: textColor, fontWeight: (reprovado || recuperacao) ? 'bold' : 'normal' }}>
                                 {m.situacao}
                             </td>
                         </tr>
