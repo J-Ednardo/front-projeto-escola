@@ -40,7 +40,11 @@ export default function Periodos() {
             setIsLoading(false);
         } catch(e) {
             setIsLoading(false);
-            toast.error('Erro ao criar período letivo');
+            if (e.customError) {
+                toast.error(e.customError.mensagem);
+            } else {
+                toast.error('Erro ao criar período letivo');
+            }
         }
     };
 
@@ -60,7 +64,11 @@ export default function Periodos() {
             setIsLoading(false);
         } catch(e) {
             setIsLoading(false);
-            toast.error('Erro ao mudar status do período');
+            if (e.customError) {
+                toast.error(e.customError.mensagem);
+            } else {
+                toast.error('Erro ao mudar status do período');
+            }
         }
     };
 

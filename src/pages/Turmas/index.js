@@ -49,7 +49,11 @@ export default function Turmas() {
             setIsLoading(false);
         } catch(e) {
             setIsLoading(false);
-            toast.error('Erro ao cadastrar turma');
+            if (e.customError) {
+                toast.error(e.customError.mensagem);
+            } else {
+                toast.error('Erro ao cadastrar turma');
+            }
         }
     };
 
