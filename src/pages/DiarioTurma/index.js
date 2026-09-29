@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { get } from 'lodash';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
