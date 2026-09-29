@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaHome, FaSignInAlt, FaUserAlt, FaCircle, FaPowerOff, FaBook, FaUsers, FaGraduationCap, FaCalendarAlt } from 'react-icons/fa';
+import { FaHome, FaSignInAlt, FaUserAlt, FaCircle, FaPowerOff, FaBook, FaUsers, FaGraduationCap, FaCalendarAlt, FaUserShield } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -35,6 +35,9 @@ export default function Header() {
                 </Link>
                 <Link to="/periodos" title="Períodos Letivos" aria-label="Períodos Letivos">
                     <FaCalendarAlt size={24}/>
+                </Link>
+                <Link to="/usuarios" title="Gerenciar Usuários" aria-label="Gerenciar Usuários">
+                    <FaUserShield size={24}/>
                 </Link>
                 </>
             )}

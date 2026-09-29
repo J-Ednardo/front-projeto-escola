@@ -16,6 +16,7 @@ import DiarioTurma from '../pages/DiarioTurma';
 import Chamada from '../pages/Chamada';
 import Periodos from '../pages/Periodos';
 import Historico from '../pages/Historico';
+import Usuarios from '../pages/Usuarios';
 
 export default function Routes () {
     return (
@@ -28,6 +29,7 @@ export default function Routes () {
             <MyRoute exact path="/boletim/:id?" component={Boletim} isClosed />
             <MyRoute exact path="/disciplinas" component={Disciplinas} isClosed allowedRoles={['ADMIN']} />
             <MyRoute exact path="/periodos" component={Periodos} isClosed allowedRoles={['ADMIN']} />
+            <MyRoute exact path="/usuarios" component={Usuarios} isClosed allowedRoles={['ADMIN']} />
             <MyRoute exact path="/turmas" component={Turmas} isClosed allowedRoles={['ADMIN', 'PROFESSOR']} />
             <MyRoute exact path="/turmas/:id/matriculas" component={DiarioTurma} isClosed allowedRoles={['ADMIN', 'PROFESSOR']} />
             <MyRoute exact path="/turmas/:id/chamada" component={Chamada} isClosed allowedRoles={['ADMIN', 'PROFESSOR']} />
