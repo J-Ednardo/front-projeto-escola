@@ -4,17 +4,23 @@ import { useParams } from 'react-router-dom';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
 import axios from '../../services/axios';
+import { useSelector } from 'react-redux';
 
 export default function Historico() {
     const { id } = useParams();
     const [data, setData] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
+    const userAlunoId = useSelector(state => state.auth.user?.aluno_id);
+    const fetchId = (id && id !== 'null' && id !== 'undefined') ? id : userAlunoId;
+
     useEffect(() => {
+        if (!fetchId) return;
+
         async function getData() {
             try {
                 setIsLoading(true);
-                const res = await axios.get('/alunos/' + id + '/historico');
+                const res = await axios.get('/alunos/' + fetchId + '/historico');
                 setData(res.data);
                 setIsLoading(false);
             } catch(e) {
@@ -23,7 +29,16 @@ export default function Historico() {
             }
         }
         getData();
-    }, [id]);
+    }, [fetchId]);
+
+    if (!fetchId) {
+        return (
+            <Container>
+                <h2>Acesso Restrito</h2>
+                <p>Sua conta de usuário ainda não está vinculada a nenhum registro de aluno. Por favor, contate a secretaria.</p>
+            </Container>
+        );
+    }
 
     if (!data) return <Container><Loading isLoading={isLoading} /></Container>;
 

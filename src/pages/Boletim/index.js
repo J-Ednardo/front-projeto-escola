@@ -18,7 +18,7 @@ export default function Boletim() {
     const [isLoading, setIsLoading] = useState(false);
     
     const userAlunoId = useSelector(state => state.auth.user?.aluno_id);
-    const fetchId = id || userAlunoId;
+    const fetchId = (id && id !== 'null' && id !== 'undefined') ? id : userAlunoId;
 
     useEffect(() => {
         if (!fetchId) return;
@@ -37,6 +37,15 @@ export default function Boletim() {
         }
         getData();
     }, [fetchId]);
+
+    if (!fetchId) {
+        return (
+            <Container>
+                <h2>Acesso Restrito</h2>
+                <p>Sua conta de usuário ainda não está vinculada a nenhum registro de aluno. Por favor, contate a secretaria ou o administrador do sistema para realizar a vinculação.</p>
+            </Container>
+        );
+    }
 
     const handleDownloadPDF = () => {
         const doc = new jsPDF();
