@@ -7,6 +7,7 @@ import { Container } from '../../styles/GlobalStyles';
 import { Form } from './styled';
 import Loading from '../../components/Loading';
 import * as actions from '../../store/modules/auth/actions';
+import axios from '../../services/axios';
 
 export default function Register() {
     const dispatch = useDispatch();
@@ -49,11 +50,23 @@ export default function Register() {
 
         dispatch(actions.registerRequest({ nome, email, password, id }));
     }
+
+    async function handleDeleteAccount() {
+        if (!window.confirm('Tem certeza que deseja EXCLUIR sua conta? Esta ação não pode ser desfeita.')) return;
+        
+        try {
+            await axios.delete('/users');
+            toast.success('Conta excluída com sucesso.');
+            dispatch(actions.loginFailure());
+        } catch (e) {
+            toast.error('Erro ao excluir conta.');
+        }
+    }
     
     return (
         <Container>
             <Loading isLoading={isLoading} />
-            <h1>{id ? 'Editar dados' : 'Crie sua conta'}</h1>
+            <h1>{id ? 'Minha Conta' : 'Crie sua conta'}</h1>
 
             <Form onSubmit={handleSubmit}>
                 <label  htmlFor='nome'>
@@ -79,14 +92,21 @@ export default function Register() {
                 <label  htmlFor='password'>
                     Senha:
                     <input 
-                        type='text' 
+                        type='password' 
                         value={password} 
                         onChange={e => setPassword(e.target.value)}
                         placeholder='Sua senha'
                     />
                 </label>
 
-                <button type="submit">{id ? 'Editar conta' : 'Criar conta'}</button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button type="submit" style={{ flex: 1 }}>{id ? 'Salvar Alterações' : 'Criar conta'}</button>
+                    {id && (
+                        <button type="button" onClick={handleDeleteAccount} style={{ background: '#d63031', color: '#fff' }}>
+                            Excluir Conta
+                        </button>
+                    )}
+                </div>
             </Form>
         </Container>
     );
