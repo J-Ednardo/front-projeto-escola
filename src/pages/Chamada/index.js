@@ -15,13 +15,16 @@ export default function Chamada() {
     const [turma, setTurma] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
+    const [aulas, setAulas] = useState([]);
+
     useEffect(() => {
         async function getData() {
             try {
                 setIsLoading(true);
-                const [resMat, resTurma] = await Promise.all([
+                const [resMat, resTurma, resAulas] = await Promise.all([
                     axios.get('/matriculas'),
-                    axios.get(`/turmas/${id}`)
+                    axios.get(`/turmas/${id}`),
+                    axios.get(`/turmas/${id}/aulas`)
                 ]);
                 const turmMat = resMat.data.filter(m => String(m.turma_id) === String(id));
                 setMatriculas(turmMat);
@@ -30,11 +33,16 @@ export default function Chamada() {
                 turmMat.forEach(m => pres[m.id] = true);
                 setPresencas(pres);
                 setTurma(resTurma.data);
+                setAulas(resAulas.data);
 
                 setIsLoading(false);
             } catch(e) {
                 setIsLoading(false);
-                toast.error('Erro ao carregar dados para chamada');
+                if (e.customError) {
+                    toast.error(e.customError.mensagem);
+                } else {
+                    toast.error('Erro ao carregar dados para chamada');
+                }
             }
         }
         getData();
@@ -146,6 +154,28 @@ export default function Chamada() {
                     <p>Nenhum aluno matriculado nesta turma.</p>
                 )}
             </form>
+
+            {aulas.length > 0 && (
+                <div style={{ marginTop: '40px' }}>
+                    <h2>Aulas Ministradas</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Conteúdo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {aulas.map(a => (
+                                <tr key={a.id}>
+                                    <td>{a.data}</td>
+                                    <td>{a.conteudo}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </Container>
     );
 }
