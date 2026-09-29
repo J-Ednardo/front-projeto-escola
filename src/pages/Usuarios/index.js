@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
 import axios from '../../services/axios';
-import { Form } from './styled';
+import { Form, PaginationContainer } from './styled';
 
 export default function Usuarios() {
     const [usuarios, setUsuarios] = useState([]);
@@ -134,11 +134,10 @@ export default function Usuarios() {
             </table>
 
             {meta.totalPages > 1 && (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px', marginTop: '20px' }}>
+                <PaginationContainer>
                     <button 
                         onClick={() => setPage(page - 1)} 
                         disabled={page === 1}
-                        style={{ padding: '8px 16px', background: page === 1 ? '#ccc' : '#6C5CE7', color: '#fff' }}
                     >
                         Anterior
                     </button>
@@ -146,11 +145,10 @@ export default function Usuarios() {
                     <button 
                         onClick={() => setPage(page + 1)} 
                         disabled={page === meta.totalPages}
-                        style={{ padding: '8px 16px', background: page === meta.totalPages ? '#ccc' : '#6C5CE7', color: '#fff' }}
                     >
                         Próximo
                     </button>
-                </div>
+                </PaginationContainer>
             )}
         </Container>
     );
