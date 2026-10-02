@@ -78,6 +78,9 @@ export default function Aluno({ match }) {
         if(!isInt(String(idade))) {
             toast.error('Idade invalida')
             formErrors = true;
+        } else if (Number(idade) < 0 || Number(idade) > 100) {
+            toast.error('Idade precisa estar entre 0 e 100');
+            formErrors = true;
         }
 
         if(formErrors) return;
@@ -90,7 +93,7 @@ export default function Aluno({ match }) {
                     nome,
                     sobrenome,
                     email,
-                    idade,
+                    idade: Number(idade),
                 });
 
                 toast.success('Aluno editado com sucesso');
@@ -99,7 +102,7 @@ export default function Aluno({ match }) {
                     nome,
                     sobrenome,
                     email,
-                    idade,
+                    idade: Number(idade),
                 });
 
                 toast.success('Aluno cadastrado com sucesso');

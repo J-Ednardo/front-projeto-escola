@@ -9,25 +9,35 @@ export default function Turmas() {
     const [turmas, setTurmas] = useState([]);
     const [disciplinas, setDisciplinas] = useState([]);
     const [periodos, setPeriodos] = useState([]);
+    const [professores, setProfessores] = useState([]);
     const [codigo, setCodigo] = useState('');
     const [disciplinaId, setDisciplinaId] = useState('');
     const [periodoId, setPeriodoId] = useState('');
+    const [professorId, setProfessorId] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         async function getData() {
             try {
                 setIsLoading(true);
-                const [resTurmas, resDisc, resPer] = await Promise.all([
+                const [resTurmas, resDisc, resPer, resUsers] = await Promise.all([
                     axios.get('/turmas'),
                     axios.get('/disciplinas'),
-                    axios.get('/periodos-letivos')
+                    axios.get('/periodos-letivos'),
+                    axios.get('/users')
                 ]);
                 setTurmas(resTurmas.data);
                 setDisciplinas(resDisc.data);
                 setPeriodos(resPer.data);
+                
+                // Filtra apenas os usuários que são professores (ou admins que lecionam)
+                const usersList = resUsers.data.data || [];
+                const profs = usersList.filter(u => u.perfil === 'PROFESSOR' || u.perfil === 'ADMIN');
+                setProfessores(profs);
+
                 setIsLoading(false);
             } catch(e) {
+                console.error(e);
                 setIsLoading(false);
                 toast.error('Erro ao carregar dados');
             }
@@ -42,7 +52,8 @@ export default function Turmas() {
             const { data } = await axios.post('/turmas', { 
                 codigo, 
                 disciplina_id: disciplinaId,
-                periodo_id: periodoId 
+                periodo_id: periodoId,
+                professor_id: professorId
             });
             setTurmas([...turmas, data]);
             toast.success('Turma cadastrada!');
@@ -71,6 +82,10 @@ export default function Turmas() {
                 <select aria-label="Período da Turma" value={periodoId} onChange={e => setPeriodoId(e.target.value)} required style={{ flex: 1 }}>
                     <option value="">Período</option>
                     {periodos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                </select>
+                <select aria-label="Professor da Turma" value={professorId} onChange={e => setProfessorId(e.target.value)} required style={{ flex: 1 }}>
+                    <option value="">Professor</option>
+                    {professores.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
                 </select>
                 <button type="submit">Cadastrar</button>
             </form>

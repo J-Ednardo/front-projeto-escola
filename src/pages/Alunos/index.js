@@ -70,8 +70,8 @@ export default function Alunos() {
         e.preventDefault();
 
         const exclamation = e.currentTarget.nextSibling;
-        exclamation.setAttribute('display', 'block');
-        e.currentTarget.remove();
+        exclamation.style.display = 'block';
+        e.currentTarget.style.display = 'none';
     };
 
     const handleDelete = async (e, id, index) => {
