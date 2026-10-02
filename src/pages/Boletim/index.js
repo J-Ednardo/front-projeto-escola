@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { useSelector } from 'react-redux';
 
 import { Container } from '../../styles/GlobalStyles';
@@ -57,7 +57,9 @@ export default function Boletim() {
         const tableRows = [];
 
         matriculas.forEach(m => {
-            const faltasCalc = (m.faltas_legado || 0) + (m.Frequencias ? m.Frequencias.filter(f => !f.presente).length : 0);
+            const faltasArray = m.Frequencia || m.Frequencias || [];
+            const novasFaltas = faltasArray.filter(f => f.presente === false || f.presente === 0 || f.presente === '0').length;
+            const faltasCalc = (m.faltas_legado || 0) + novasFaltas;
             const data = [
                 m.Turma?.Disciplina?.nome || 'N/A',
                 m.Turma?.codigo || 'N/A',
@@ -72,7 +74,7 @@ export default function Boletim() {
             tableRows.push(data);
         });
 
-        doc.autoTable({
+        autoTable(doc, {
             startY: 30,
             head: [tableColumn],
             body: tableRows,
@@ -106,7 +108,9 @@ export default function Boletim() {
                 </thead>
                 <tbody>
                     {matriculas.map(m => {
-                        const faltasCalc = (m.faltas_legado || 0) + (m.Frequencias ? m.Frequencias.filter(f => !f.presente).length : 0);
+                        const faltasArray = m.Frequencia || m.Frequencias || [];
+                        const novasFaltas = faltasArray.filter(f => f.presente === false || f.presente === 0 || f.presente === '0').length;
+                        const faltasCalc = (m.faltas_legado || 0) + novasFaltas;
                         const reprovado = m.situacao === 'Reprovado por falta' || m.situacao === 'Reprovado por nota';
                         const recuperacao = m.situacao === 'Em Recuperação';
                         

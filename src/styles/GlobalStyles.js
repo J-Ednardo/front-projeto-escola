@@ -141,10 +141,10 @@ export default createGlobalStyle`
 `;
 
 export const Container = styled.section`
-    width: 100%;
-    max-width: 1000px;
+    flex: 1;
+    min-width: 0;
     background: ${colors.cardBg};
-    margin: 40px auto;
+    margin: 40px;
     padding: 40px;
     border-radius: ${metrics.borderRadius};
     box-shadow: ${metrics.boxShadow};

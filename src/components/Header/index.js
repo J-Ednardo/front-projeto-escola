@@ -10,6 +10,7 @@ import history from '../../services/history';
 export default function Header() {
     const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
     const perfil = useSelector(state => state.auth.user?.perfil);
+    const aluno_id = useSelector(state => state.auth.user?.aluno_id);
     const dispatch = useDispatch();
 
     const handleLogout = e => {
@@ -53,7 +54,7 @@ export default function Header() {
             </Link>
 
             {perfil === 'ALUNO' && (
-                <Link to={`/historico/${useSelector(state => state.auth.user?.aluno_id)}`} title="Meu Histórico" aria-label="Meu Histórico">
+                <Link to={`/historico/${aluno_id}`} title="Meu Histórico" aria-label="Meu Histórico">
                     <FaBook size={24}/>
                 </Link>
             )}
