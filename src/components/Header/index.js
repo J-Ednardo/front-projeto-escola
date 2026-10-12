@@ -1,77 +1,106 @@
 import React from 'react';
-import { FaHome, FaSignInAlt, FaUserAlt, FaCircle, FaPowerOff, FaBook, FaUsers, FaGraduationCap, FaCalendarAlt, FaUserShield } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { FaHome, FaSignInAlt, FaUserAlt, FaPowerOff, FaBook, FaUsers, FaGraduationCap, FaCalendarAlt, FaUserShield } from 'react-icons/fa';
+import { Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { Nav } from './styled';
+import { Nav, NavItem, UserBadge } from './styled';
 import * as actions from '../../store/modules/auth/actions';
 import history from '../../services/history';
 
 export default function Header() {
+    const location = useLocation();
     const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
-    const perfil = useSelector(state => state.auth.user?.perfil);
-    const aluno_id = useSelector(state => state.auth.user?.aluno_id);
+    const user = useSelector(state => state.auth.user);
+    const perfil = user?.perfil;
+    const aluno_id = user?.aluno_id;
     const dispatch = useDispatch();
 
     const handleLogout = e => {
         e.preventDefault();
         dispatch(actions.loginFailure());
         history.push('/');
-    }
+    };
+
+    const isActive = (path) => {
+        if (path === '/') return location.pathname === '/';
+        return location.pathname.startsWith(path);
+    };
 
     return (
         <Nav aria-label="Sidebar">
             <Link to="/" className="logo" title="Início">
-                <FaGraduationCap size={32}/>
+                <div className="logo-icon">
+                    <FaGraduationCap size={24}/>
+                </div>
             </Link>
 
-            <Link to="/" title="Início" aria-label="Início">
-                <FaHome size={24}/>
-            </Link>
+            <div className="nav-items">
+                <NavItem to="/" title="Início" aria-label="Início" className={isActive('/') ? 'active' : ''}>
+                    <FaHome size={20}/>
+                    <span className="tooltip">Início</span>
+                </NavItem>
 
-            {perfil === 'ADMIN' && (
-                <>
-                <Link to="/disciplinas" title="Disciplinas" aria-label="Disciplinas">
-                    <FaBook size={24}/>                
-                </Link>
-                <Link to="/periodos" title="Períodos Letivos" aria-label="Períodos Letivos">
-                    <FaCalendarAlt size={24}/>
-                </Link>
-                <Link to="/usuarios" title="Gerenciar Usuários" aria-label="Gerenciar Usuários">
-                    <FaUserShield size={24}/>
-                </Link>
-                </>
-            )}
+                {perfil === 'ADMIN' && (
+                    <>
+                    <NavItem to="/disciplinas" title="Disciplinas" aria-label="Disciplinas" className={isActive('/disciplinas') ? 'active' : ''}>
+                        <FaBook size={20}/>
+                        <span className="tooltip">Disciplinas</span>
+                    </NavItem>
+                    <NavItem to="/periodos" title="Períodos Letivos" aria-label="Períodos Letivos" className={isActive('/periodos') ? 'active' : ''}>
+                        <FaCalendarAlt size={20}/>
+                        <span className="tooltip">Períodos</span>
+                    </NavItem>
+                    <NavItem to="/usuarios" title="Gerenciar Usuários" aria-label="Gerenciar Usuários" className={isActive('/usuarios') ? 'active' : ''}>
+                        <FaUserShield size={20}/>
+                        <span className="tooltip">Usuários</span>
+                    </NavItem>
+                    </>
+                )}
 
-            {(perfil === 'ADMIN' || perfil === 'PROFESSOR') && (
-                <Link to="/turmas" title="Turmas" aria-label="Turmas">
-                    <FaUsers size={24}/>                
-                </Link>
-            )}
+                {(perfil === 'ADMIN' || perfil === 'PROFESSOR') && (
+                    <NavItem to="/turmas" title="Turmas" aria-label="Turmas" className={isActive('/turmas') ? 'active' : ''}>
+                        <FaUsers size={20}/>
+                        <span className="tooltip">Turmas</span>
+                    </NavItem>
+                )}
 
-            <Link to="/register" title="Perfil" aria-label="Perfil">
-                <FaUserAlt size={24}/>                
-            </Link>
+                <NavItem to="/register" title="Perfil" aria-label="Perfil" className={isActive('/register') ? 'active' : ''}>
+                    <FaUserAlt size={19}/>
+                    <span className="tooltip">Minha Conta</span>
+                </NavItem>
 
-            {perfil === 'ALUNO' && (
-                <Link to={`/historico/${aluno_id}`} title="Meu Histórico" aria-label="Meu Histórico">
-                    <FaBook size={24}/>
-                </Link>
-            )}
+                {perfil === 'ALUNO' && (
+                    <NavItem to={`/historico/${aluno_id}`} title="Meu Histórico" aria-label="Meu Histórico" className={isActive('/historico') ? 'active' : ''}>
+                        <FaBook size={20}/>
+                        <span className="tooltip">Meu Histórico</span>
+                    </NavItem>
+                )}
+            </div>
             
-            <div style={{ flex: 1 }}></div>
+            <div className="spacer" style={{ flex: 1 }}></div>
 
-            {isLoggedIn ? (
-                <Link onClick={handleLogout} to="/logout" title="Sair" aria-label="Sair">
-                    <FaPowerOff size={24}/>
-                </Link>
-            ): (
-                <Link to="/login" title="Entrar" aria-label="Entrar">
-                    <FaSignInAlt size={24}/>
-                </Link>
+            {isLoggedIn && (
+                <UserBadge title={`Conectado como ${user?.nome || 'Usuário'} (${perfil || 'Usuário'})`}>
+                    <div className="avatar">
+                        {(user?.nome || 'U')[0].toUpperCase()}
+                    </div>
+                    <span className="role-tag">{perfil || 'USER'}</span>
+                </UserBadge>
             )}
 
-            {isLoggedIn &&  <FaCircle size={12} color='#00B894' style={{ marginBottom: '20px' }} />}
+            <div className="auth-action">
+                {isLoggedIn ? (
+                    <NavItem onClick={handleLogout} to="/logout" title="Sair" aria-label="Sair" className="logout-btn">
+                        <FaPowerOff size={19}/>
+                        <span className="tooltip">Sair</span>
+                    </NavItem>
+                ): (
+                    <NavItem to="/login" title="Entrar" aria-label="Entrar" className={isActive('/login') ? 'active' : ''}>
+                        <FaSignInAlt size={20}/>
+                        <span className="tooltip">Entrar</span>
+                    </NavItem>
+                )}
+            </div>
         </Nav>
     );
 }

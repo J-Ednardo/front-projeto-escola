@@ -30,11 +30,33 @@ export default function MyRoute({ component: Component, isClosed, allowedRoles, 
             // Fallback genérico para quem não tem acesso
             return (
                 <Container>
-                    <div style={{ textAlign: 'center', padding: '50px 20px' }}>
-                        <h2>Acesso Restrito</h2>
-                        <p style={{ marginTop: '15px' }}>Você não tem permissão para acessar esta página.</p>
-                        <p style={{ marginTop: '10px' }}>Seu perfil atual é <strong>{user.perfil || 'Não definido'}</strong>.</p>
-                        <p style={{ marginTop: '10px' }}>Aguarde um administrador configurar seu acesso ou vincular seu cadastro de aluno.</p>
+                    <div style={{ 
+                        textAlign: 'center', 
+                        padding: '60px 24px', 
+                        maxWidth: '520px', 
+                        margin: '0 auto',
+                        background: '#F8FAFC',
+                        borderRadius: '16px',
+                        border: '1px solid #E2E8F0'
+                    }}>
+                        <h2 style={{ fontSize: '20px', color: '#0F172A', marginBottom: '12px' }}>Acesso Restrito</h2>
+                        <p style={{ color: '#475569', fontSize: '14px', lineHeight: '1.6', marginBottom: '8px' }}>
+                            Você não tem permissão para acessar esta página com suas credenciais atuais.
+                        </p>
+                        <p style={{ color: '#475569', fontSize: '14px', marginBottom: '16px' }}>
+                            Seu perfil cadastrado: <span style={{ 
+                                display: 'inline-block',
+                                background: '#EFF6FF', 
+                                color: '#2563EB', 
+                                padding: '2px 8px', 
+                                borderRadius: '4px', 
+                                fontWeight: 700,
+                                fontSize: '12px'
+                            }}>{user.perfil || 'Não definido'}</span>
+                        </p>
+                        <p style={{ color: '#94A3B8', fontSize: '13px' }}>
+                            Aguarde a coordenação configurar suas permissões ou vincular seu cadastro discente.
+                        </p>
                     </div>
                 </Container>
             );
