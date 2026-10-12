@@ -116,7 +116,13 @@ export default function Boletim() {
 
             <StudentBanner>
                 <div className="student-avatar">
-                    <FaGraduationCap size={22} />
+                    {get(aluno, 'Fotos[0].url', false) ? (
+                        <img src={aluno.Fotos[0].url} alt={aluno.nome} />
+                    ) : (
+                        <div className="avatar-placeholder">
+                            {(aluno.nome || 'A')[0].toUpperCase()}
+                        </div>
+                    )}
                 </div>
                 <div className="student-details">
                     <h3>{aluno.nome} {aluno.sobrenome}</h3>

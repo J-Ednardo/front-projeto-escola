@@ -55,17 +55,37 @@ export const StudentBanner = styled.div`
     margin-bottom: 24px;
 
     .student-avatar {
-        width: 48px;
-        height: 48px;
+        width: 52px;
+        height: 52px;
         border-radius: 50%;
-        background: #EFF6FF;
-        color: ${colors.primary};
-        font-weight: 700;
-        font-size: 18px;
+        overflow: hidden;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid #DBEAFE;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #FFFFFF;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08);
+        }
+
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #EFF6FF;
+            color: ${colors.primary};
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #DBEAFE;
+        }
     }
 
     .student-details {

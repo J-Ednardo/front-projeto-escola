@@ -180,7 +180,7 @@ export default function Alunos() {
                                         <span className="aluno-email">{aluno.email}</span>
                                     </td>
                                     {perfil !== 'ALUNO' && (
-                                        <td style={{ textAlign: 'right' }}>
+                                        <td style={{ textAlign: 'right', verticalAlign: 'middle' }}>
                                             <ActionGroup>
                                                 <ActionButton as={Link} to={`/boletim/${aluno.id}`} title="Ver Boletim" className="btn-secondary">
                                                     <FaFileAlt size={13} /> Boletim

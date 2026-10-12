@@ -150,23 +150,34 @@ export const ActionGroup = styled.div`
     align-items: center;
     justify-content: flex-end;
     gap: 8px;
+    vertical-align: middle;
 
     .delete-btn-invisible {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         background: ${colors.error};
         color: #FFFFFF;
-        padding: 6px 12px;
+        padding: 0 12px;
         border-radius: 6px;
         font-size: 12px;
         font-weight: 600;
         height: 32px;
         border: none;
-        align-items: center;
-        gap: 4px;
+        gap: 6px;
         cursor: pointer;
+        line-height: 1;
+        box-sizing: border-box;
+        vertical-align: middle;
         animation: pulse 1s infinite alternate;
 
         &:hover {
             background: #B91C1C;
+        }
+
+        svg {
+            display: block;
+            flex-shrink: 0;
         }
     }
 
@@ -177,13 +188,26 @@ export const ActionGroup = styled.div`
 `;
 
 export const ActionButton = styled.button`
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     height: 32px;
-    padding: 0 10px;
+    padding: 0 12px;
     font-size: 12px;
     font-weight: 500;
+    line-height: 1;
     border-radius: 6px;
     box-shadow: none;
     text-decoration: none;
+    box-sizing: border-box;
+    vertical-align: middle;
+    transition: all 0.2s ease;
+
+    svg {
+        display: block;
+        flex-shrink: 0;
+    }
 
     &.btn-secondary {
         background: #F1F5F9;
@@ -198,6 +222,7 @@ export const ActionButton = styled.button`
 
     &.btn-icon {
         width: 32px;
+        height: 32px;
         padding: 0;
         background: #F8FAFC;
         color: ${colors.textBody};
@@ -211,6 +236,9 @@ export const ActionButton = styled.button`
     }
 
     &.btn-danger-soft {
+        width: 32px;
+        height: 32px;
+        padding: 0;
         background: ${colors.errorBg};
         color: ${colors.error};
         border: 1px solid ${colors.errorBorder};

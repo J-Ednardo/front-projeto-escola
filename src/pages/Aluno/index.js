@@ -135,7 +135,10 @@ export default function Aluno({ match }) {
                 <div>
                     <h1>{id ? 'Editar aluno' : 'Novo aluno'}</h1>
                     <p className="subtitle">
-                        {id ? `Atualize as informações cadastrais do aluno #${id}` : 'Preencha os dados para registrar um novo discente'}
+                        {id 
+                            ? `Atualize as informações cadastrais de ${nome ? `${nome}${sobrenome ? ` ${sobrenome}` : ''}` : 'aluno'}` 
+                            : 'Preencha os dados para registrar um novo discente'
+                        }
                     </p>
                 </div>
             </PageHeader>
