@@ -3,7 +3,7 @@ import { colors, metrics } from './theme';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default createGlobalStyle`
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
     * {
         margin: 0;
@@ -13,10 +13,11 @@ export default createGlobalStyle`
     }
 
     body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         background: ${colors.background};
-        color: ${colors.textTitle};
+        color: ${colors.textBody};
         -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 
     html, body, #root {
@@ -28,86 +29,134 @@ export default createGlobalStyle`
         align-items: stretch;
     }
 
+    h1, h2, h3, h4, h5, h6 {
+        color: ${colors.textTitle};
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    h1 {
+        font-size: 1.65rem;
+        line-height: 1.25;
+        margin-bottom: 8px;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+        line-height: 1.3;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+        line-height: 1.4;
+    }
+
     input, select {
-        height: 48px;
-        font-size: 15px;
+        height: 44px;
+        font-size: 14px;
         font-family: inherit;
         border: 1px solid ${colors.border};
-        padding: 0 16px;
-        border-radius: 12px;
-        background: #FAFAFA;
-        transition: all 0.3s;
+        padding: 0 14px;
+        border-radius: ${metrics.borderRadiusSm};
+        background: #FFFFFF;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
         color: ${colors.textTitle};
 
+        &::placeholder {
+            color: ${colors.textMuted};
+        }
+
         &:focus {
-            border: 1px solid ${colors.primary};
-            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
-            background: #fff;
+            border-color: ${colors.primary};
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            background: #FFFFFF;
         }
         
         &:disabled {
-            background: #E8E9ED;
+            background: #F1F5F9;
+            color: ${colors.textMuted};
             cursor: not-allowed;
+            border-color: ${colors.border};
         }
     }
 
     button {
         cursor: pointer;
         background: ${colors.primary};
-        border: none;
-        color: #fff;
-        padding: 0 24px;
-        height: 48px;
+        border: 1px solid transparent;
+        color: #FFFFFF;
+        padding: 0 20px;
+        height: 44px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 12px;
+        gap: 8px;
+        border-radius: ${metrics.borderRadiusSm};
         font-weight: 600;
-        font-size: 15px;
+        font-size: 14px;
         font-family: inherit;
-        transition: all 300ms;
-    }
+        letter-spacing: -0.01em;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: ${metrics.boxShadowSm};
 
-    button:hover {
-        filter: brightness(90%);
-        transform: translateY(-1px);
+        &:hover {
+            background: ${colors.primaryDark};
+            transform: translateY(-1px);
+            box-shadow: ${metrics.boxShadow};
+        }
+
+        &:active {
+            transform: scale(0.98);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
     }
 
     a {
         text-decoration: none;
         color: ${colors.primary};
-        transition: all 300ms;
+        transition: color 0.2s ease;
+
+        &:hover {
+            color: ${colors.primaryDark};
+        }
     }
 
     table {
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
-        background: #fff;
-        border-radius: 16px;
+        background: #FFFFFF;
+        border-radius: ${metrics.borderRadius};
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-        border: 1px solid #F1F2F6;
+        box-shadow: ${metrics.boxShadowSm};
+        border: 1px solid ${colors.border};
         margin: 20px 0;
+        font-variant-numeric: tabular-nums;
     }
 
     th {
         text-align: left;
-        padding: 16px 24px;
-        font-size: 12px;
+        padding: 14px 20px;
+        font-size: 11px;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.05em;
         font-weight: 700;
-        color: #8F95B2;
-        background: #FAFBFC;
-        border-bottom: 1px solid #F1F2F6;
+        color: ${colors.textMuted};
+        background: #F8FAFC;
+        border-bottom: 1px solid ${colors.border};
     }
 
     td {
-        padding: 16px 24px;
+        padding: 14px 20px;
         font-size: 14px;
-        color: #2D3436;
-        border-bottom: 1px solid #F1F2F6;
+        color: ${colors.textBody};
+        border-bottom: 1px solid ${colors.borderLight};
         vertical-align: middle;
     }
 
@@ -116,11 +165,11 @@ export default createGlobalStyle`
     }
 
     tbody tr {
-        transition: all 0.2s ease;
-    }
+        transition: background-color 0.15s ease;
 
-    tbody tr:hover {
-        background: #F8F9FA;
+        &:hover {
+            background-color: #F8FAFC;
+        }
     }
 
     ul {
@@ -144,9 +193,14 @@ export const Container = styled.section`
     flex: 1;
     min-width: 0;
     background: ${colors.cardBg};
-    margin: 40px;
-    padding: 40px;
-    border-radius: ${metrics.borderRadius};
+    margin: 32px;
+    padding: 36px 40px;
+    border-radius: ${metrics.borderRadiusLg};
     box-shadow: ${metrics.boxShadow};
     border: 1px solid ${colors.border};
+
+    @media (max-width: 768px) {
+        margin: 16px;
+        padding: 20px;
+    }
 `;
