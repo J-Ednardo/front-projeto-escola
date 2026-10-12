@@ -59,6 +59,11 @@ export default function Chamada() {
     }, [id]);
 
     const isFechado = turma?.PeriodoLetivo?.status === 'FECHADO';
+    const jaExisteAulaNaData = aulas.some(a => {
+        if (!a.data) return false;
+        const aData = String(a.data).split('T')[0];
+        return aData === dataAula;
+    });
 
     const handleToggle = (matriculaId) => {
         setPresencas({
@@ -69,6 +74,10 @@ export default function Chamada() {
 
     const handleSalvarChamada = async (e) => {
         e.preventDefault();
+        if (jaExisteAulaNaData) {
+            toast.error('Já existe uma aula/chamada registrada para esta turma nesta data.');
+            return;
+        }
         try {
             setIsLoading(true);
             
@@ -117,6 +126,13 @@ export default function Chamada() {
                 </NoticeAlert>
             )}
 
+            {!isFechado && jaExisteAulaNaData && (
+                <NoticeAlert $variant="danger">
+                    <FaExclamationTriangle size={18} />
+                    <span>Já existe uma aula/chamada registrada para a data {dataAula}. Selecione outra data para registrar uma nova chamada.</span>
+                </NoticeAlert>
+            )}
+
             <form onSubmit={handleSalvarChamada}>
                 <LessonCard>
                     <div className="fields-row">
@@ -130,6 +146,11 @@ export default function Chamada() {
                                     disabled={isFechado} 
                                     required 
                                 />
+                                {jaExisteAulaNaData && (
+                                    <span style={{ color: '#DC2626', fontSize: '12px', fontWeight: 600, marginTop: '2px' }}>
+                                        Chamada já registrada nesta data
+                                    </span>
+                                )}
                             </label>
                         </div>
                         <div style={{ flex: 2 }}>
@@ -189,8 +210,8 @@ export default function Chamada() {
                             </table>
                         </AttendanceTableWrapper>
 
-                        <SaveButton type="submit" disabled={isFechado}>
-                            Salvar Lote de Chamada
+                        <SaveButton type="submit" disabled={isFechado || jaExisteAulaNaData}>
+                            {jaExisteAulaNaData ? 'Chamada Já Registrada Nesta Data' : 'Salvar Lote de Chamada'}
                         </SaveButton>
                     </>
                 )}

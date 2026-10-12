@@ -20,9 +20,9 @@ export const NoticeAlert = styled.div`
     display: flex;
     align-items: center;
     gap: 12px;
-    background: ${colors.warningBg};
-    color: ${colors.warning};
-    border: 1px solid ${colors.warningBorder};
+    background: ${props => props.$variant === 'danger' ? '#FEF2F2' : colors.warningBg};
+    color: ${props => props.$variant === 'danger' ? '#991B1B' : colors.warning};
+    border: 1px solid ${props => props.$variant === 'danger' ? '#FCA5A5' : colors.warningBorder};
     padding: 14px 18px;
     border-radius: ${metrics.borderRadiusSm};
     margin-bottom: 24px;
@@ -116,6 +116,14 @@ export const SaveButton = styled.button`
     font-size: 15px;
     font-weight: 600;
     margin-top: 8px;
+
+    &:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+        background: #94A3B8;
+        border-color: #94A3B8;
+        box-shadow: none;
+    }
 `;
 
 export const AulasAnterioresSection = styled.div`
