@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { FaBook, FaPlus, FaClock } from 'react-icons/fa';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
+import EmptyState from '../../components/EmptyState';
 import axios from '../../services/axios';
+import { PageHeader, FormCard, DisciplinasTableWrapper } from './styled';
 
 export default function Disciplinas() {
     const [disciplinas, setDisciplinas] = useState([]);
@@ -44,21 +47,76 @@ export default function Disciplinas() {
     return (
         <Container>
             <Loading isLoading={isLoading} />
-            <h1>Disciplinas</h1>
+            
+            <PageHeader>
+                <div>
+                    <h1>Disciplinas</h1>
+                    <p className="subtitle">Catálogo curricular e carga horária das matérias ofertadas</p>
+                </div>
+            </PageHeader>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '15px', marginTop: '20px', marginBottom: '20px' }}>
-                <input type="text" placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} required style={{ flex: 1 }} />
-                <input type="number" placeholder="Carga horária" value={carga} onChange={e => setCarga(e.target.value)} required style={{ flex: 1 }} />
-                <button type="submit">Cadastrar</button>
-            </form>
+            <FormCard>
+                <h3>Cadastrar Nova Disciplina</h3>
+                <form onSubmit={handleSubmit}>
+                    <input 
+                        type="text" 
+                        placeholder="Nome" 
+                        value={nome} 
+                        onChange={e => setNome(e.target.value)} 
+                        required 
+                    />
+                    <input 
+                        type="number" 
+                        placeholder="Carga horária" 
+                        value={carga} 
+                        onChange={e => setCarga(e.target.value)} 
+                        required 
+                    />
+                    <button type="submit">
+                        <FaPlus size={12} /> Cadastrar
+                    </button>
+                </form>
+            </FormCard>
 
-            <ul>
-                {disciplinas.map(d => (
-                    <li key={d.id} style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>
-                        {d.nome} - {d.carga_horaria}h
-                    </li>
-                ))}
-            </ul>
+            {disciplinas.length === 0 && !isLoading ? (
+                <EmptyState 
+                    title="Nenhuma disciplina cadastrada" 
+                    description="Cadastre as disciplinas da matriz curricular utilizando o formulário acima."
+                />
+            ) : (
+                <DisciplinasTableWrapper>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style={{ width: '80px' }}>ID</th>
+                                <th>Nome da Disciplina</th>
+                                <th style={{ width: '160px', textAlign: 'center' }}>Carga Horária</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {disciplinas.map(d => (
+                                <tr key={d.id}>
+                                    <td style={{ color: '#94A3B8', fontWeight: 600 }}>#{d.id}</td>
+                                    <td style={{ fontWeight: 600 }}>{d.nome}</td>
+                                    <td style={{ textAlign: 'center', fontWeight: 700 }}>
+                                        <span style={{ 
+                                            background: '#EFF6FF', 
+                                            color: '#2563EB', 
+                                            padding: '4px 10px', 
+                                            borderRadius: '6px', 
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                        }}>
+                                            <FaClock size={11} /> {d.carga_horaria}h
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </DisciplinasTableWrapper>
+            )}
         </Container>
     );
 }
