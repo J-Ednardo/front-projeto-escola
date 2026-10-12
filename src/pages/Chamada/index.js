@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useParams, useHistory } from 'react-router-dom';
+import { FaExclamationTriangle, FaCalendarAlt, FaCheck, FaTimes } from 'react-icons/fa';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
+import EmptyState from '../../components/EmptyState';
 import axios from '../../services/axios';
+import { 
+    PageHeader, 
+    NoticeAlert, 
+    LessonCard, 
+    AttendanceTableWrapper, 
+    ToggleButton, 
+    SaveButton, 
+    AulasAnterioresSection 
+} from './styled';
 
 export default function Chamada() {
     const { id } = useParams(); // turma_id
@@ -14,7 +25,6 @@ export default function Chamada() {
     const [presencas, setPresencas] = useState({}); // { matricula_id: true/false }
     const [turma, setTurma] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-
     const [aulas, setAulas] = useState([]);
 
     useEffect(() => {
@@ -33,7 +43,7 @@ export default function Chamada() {
                 turmMat.forEach(m => pres[m.id] = true);
                 setPresencas(pres);
                 setTurma(resTurma.data);
-                setAulas(resAulas.data);
+                setAulas(resAulas.data || []);
 
                 setIsLoading(false);
             } catch(e) {
@@ -92,89 +102,120 @@ export default function Chamada() {
     return (
         <Container>
             <Loading isLoading={isLoading} />
-            <h1>Fazer Chamada - Turma {id}</h1>
+            
+            <PageHeader>
+                <div>
+                    <h1>Fazer Chamada - Turma {turma?.codigo ? `${turma.codigo} (#${id})` : id}</h1>
+                    <p className="subtitle">Registro diário de frequência e lançamento de conteúdo programático</p>
+                </div>
+            </PageHeader>
 
             {isFechado && (
-                <div style={{ background: '#f8d7da', color: '#721c24', padding: '15px', borderRadius: '4px', marginTop: '15px', fontWeight: 'bold' }}>
-                    Este semestre esta encerrado e arquivado. Edicoes bloqueadas.
-                </div>
+                <NoticeAlert>
+                    <FaExclamationTriangle size={18} />
+                    <span>Este semestre está encerrado e arquivado. Edições bloqueadas.</span>
+                </NoticeAlert>
             )}
 
-            <form onSubmit={handleSalvarChamada} style={{ marginTop: '20px' }}>
-                <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
-                    <div style={{ flex: 1 }}>
-                        <label>Data da Aula</label>
-                        <input type="date" value={dataAula} onChange={e => setDataAula(e.target.value)} disabled={isFechado} required style={{ width: '100%', padding: '8px', background: isFechado ? '#e9ecef' : '#fff' }} />
+            <form onSubmit={handleSalvarChamada}>
+                <LessonCard>
+                    <div className="fields-row">
+                        <div style={{ flex: 1 }}>
+                            <label>
+                                Data da Aula
+                                <input 
+                                    type="date" 
+                                    value={dataAula} 
+                                    onChange={e => setDataAula(e.target.value)} 
+                                    disabled={isFechado} 
+                                    required 
+                                />
+                            </label>
+                        </div>
+                        <div style={{ flex: 2 }}>
+                            <label>
+                                Conteúdo Ministrado
+                                <input 
+                                    type="text" 
+                                    placeholder="Ex: Tópico abordado, capítulo ou exercícios realizados"
+                                    value={conteudo} 
+                                    onChange={e => setConteudo(e.target.value)} 
+                                    disabled={isFechado} 
+                                    required 
+                                />
+                            </label>
+                        </div>
                     </div>
-                    <div style={{ flex: 3 }}>
-                        <label>Conteúdo Ministrado</label>
-                        <input type="text" value={conteudo} onChange={e => setConteudo(e.target.value)} disabled={isFechado} required style={{ width: '100%', padding: '8px', background: isFechado ? '#e9ecef' : '#fff' }} />
-                    </div>
-                </div>
+                </LessonCard>
 
-                <table style={{ marginBottom: '20px' }}>
-                    <thead>
-                        <tr>
-                            <th>Aluno (Matrícula ID)</th>
-                            <th style={{ textAlign: 'center', width: '150px' }}>Presença</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {matriculas.map(m => (
-                            <tr key={m.id} style={{ backgroundColor: presencas[m.id] ? 'inherit' : '#ffe6e6' }}>
-                                <td>
-                                    {m.Aluno?.nome} {m.Aluno?.sobrenome} (Matrícula #{m.id})
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <button 
-                                        type="button"
-                                        disabled={isFechado}
-                                        onClick={() => handleToggle(m.id)}
-                                        style={{ 
-                                            background: presencas[m.id] ? '#00b894' : '#d63031', 
-                                            height: '40px',
-                                            padding: '0 16px',
-                                            width: '100%',
-                                            opacity: isFechado ? 0.6 : 1
-                                        }}
-                                    >
-                                        {presencas[m.id] ? 'Presente' : 'Falta'}
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-
-                {matriculas.length > 0 ? (
-                    <button type="submit" disabled={isFechado} style={{ width: '100%', padding: '15px', background: '#007bff', color: '#fff', fontSize: '16px', cursor: isFechado ? 'not-allowed' : 'pointer', opacity: isFechado ? 0.6 : 1 }}>
-                        Salvar Lote de Chamada
-                    </button>
+                {matriculas.length === 0 ? (
+                    <EmptyState 
+                        title="Nenhum aluno matriculado nesta turma" 
+                        description="Você precisa matricular alunos nesta turma no Diário antes de registrar chamadas."
+                    />
                 ) : (
-                    <p>Nenhum aluno matriculado nesta turma.</p>
+                    <>
+                        <AttendanceTableWrapper>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Aluno (Matrícula ID)</th>
+                                        <th style={{ textAlign: 'center', width: '160px' }}>Presença</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {matriculas.map(m => {
+                                        const isPresente = presencas[m.id];
+                                        return (
+                                            <tr key={m.id}>
+                                                <td className="aluno-cell">
+                                                    {m.Aluno?.nome} {m.Aluno?.sobrenome} 
+                                                    <span className="matricula-id">(Matrícula #{m.id})</span>
+                                                </td>
+                                                <td style={{ textAlign: 'center' }}>
+                                                    <ToggleButton 
+                                                        type="button"
+                                                        disabled={isFechado}
+                                                        onClick={() => handleToggle(m.id)}
+                                                        className={isPresente ? 'presente' : 'falta'}
+                                                    >
+                                                        {isPresente ? <><FaCheck size={11} /> Presente</> : <><FaTimes size={11} /> Falta</>}
+                                                    </ToggleButton>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </AttendanceTableWrapper>
+
+                        <SaveButton type="submit" disabled={isFechado}>
+                            Salvar Lote de Chamada
+                        </SaveButton>
+                    </>
                 )}
             </form>
 
             {aulas.length > 0 && (
-                <div style={{ marginTop: '40px' }}>
+                <AulasAnterioresSection>
                     <h2>Aulas Ministradas</h2>
                     <table>
                         <thead>
                             <tr>
-                                <th>Data</th>
+                                <th style={{ width: '160px' }}>Data</th>
                                 <th>Conteúdo</th>
                             </tr>
                         </thead>
                         <tbody>
                             {aulas.map(a => (
                                 <tr key={a.id}>
-                                    <td>{a.data}</td>
+                                    <td style={{ fontWeight: 600 }}>{a.data}</td>
                                     <td>{a.conteudo}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                </div>
+                </AulasAnterioresSection>
             )}
         </Container>
     );

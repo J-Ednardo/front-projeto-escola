@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { get } from 'lodash';
+import { FaUserPlus, FaCalendarCheck, FaExclamationTriangle } from 'react-icons/fa';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
+import EmptyState from '../../components/EmptyState';
 import axios from '../../services/axios';
+import { 
+    PageHeader, 
+    ChamadaButton, 
+    NoticeAlert, 
+    FormRow, 
+    TableWrapper, 
+    GradeInput, 
+    StatusPill 
+} from './styled';
 
 export default function DiarioTurma() {
     const { id } = useParams(); // turma_id
@@ -48,7 +59,8 @@ export default function DiarioTurma() {
                 aluno_id: alunoId 
             });
             setMatriculas([...matriculas, data]);
-            toast.success('Aluno matriculado!');
+            setAlunoId('');
+            toast.success('Aluno matriculado com sucesso!');
             setIsLoading(false);
         } catch(e) {
             setIsLoading(false);
@@ -69,98 +81,136 @@ export default function DiarioTurma() {
         }
     };
 
+    const getStatusClass = (situacao) => {
+        if (!situacao) return 'cursando';
+        if (situacao === 'Aprovado') return 'aprovado';
+        if (situacao === 'Em Recuperação') return 'recuperacao';
+        if (situacao.includes('Reprovado')) return 'reprovado';
+        return 'cursando';
+    };
+
     return (
         <Container>
             <Loading isLoading={isLoading} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h1>Diário da Turma {id}</h1>
-                <Link to={`/turmas/${id}/chamada`} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: '#6C5CE7', color: '#fff', padding: '0 20px', height: '40px', borderRadius: '12px', fontSize: '14px', fontWeight: 600 }}>
-                    Fazer Chamada
-                </Link>
-            </div>
+            
+            <PageHeader>
+                <div>
+                    <h1>Diário da Turma {turma?.codigo ? `(${turma.codigo})` : `#${id}`}</h1>
+                    <p className="subtitle">
+                        {turma?.Disciplina?.nome || 'Disciplina'} • {turma?.PeriodoLetivo?.nome || 'Semestre'}
+                    </p>
+                </div>
+                <ChamadaButton to={`/turmas/${id}/chamada`}>
+                    <FaCalendarCheck size={14} /> Fazer Chamada
+                </ChamadaButton>
+            </PageHeader>
 
             {isFechado && (
-                <div style={{ background: '#FFEAA7', color: '#D35400', padding: '16px', borderRadius: '12px', marginTop: '15px', fontWeight: 'bold' }}>
-                    Este semestre esta encerrado e arquivado. Edicoes bloqueadas.
-                </div>
+                <NoticeAlert>
+                    <FaExclamationTriangle size={18} />
+                    <span>Este semestre está encerrado e arquivado. Lançamento de notas e alterações bloqueados.</span>
+                </NoticeAlert>
             )}
 
-            <form onSubmit={handleMatricular} style={{ display: 'flex', gap: '15px', marginTop: '20px', marginBottom: '20px' }}>
-                <select value={alunoId} onChange={e => setAlunoId(e.target.value)} required disabled={isFechado} style={{ flex: 1 }}>
-                    <option value="">Selecione o Aluno</option>
+            <FormRow onSubmit={handleMatricular}>
+                <select value={alunoId} onChange={e => setAlunoId(e.target.value)} required disabled={isFechado}>
+                    <option value="">Selecione o Aluno para Matricular nesta Turma</option>
                     {alunos.map(a => <option key={a.id} value={a.id}>{a.nome} {a.sobrenome}</option>)}
                 </select>
-                <button type="submit" disabled={isFechado}>Matricular</button>
-            </form>
+                <button type="submit" disabled={isFechado}>
+                    <FaUserPlus size={13} /> Matricular Aluno
+                </button>
+            </FormRow>
 
-            <div style={{ overflowX: 'auto' }}>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Aluno</th>
-                            <th>Faltas</th>
-                            <th>N1</th>
-                            <th>N2</th>
-                            <th>N3</th>
-                            <th>Recuperação</th>
-                            <th>Média</th>
-                            <th>Situação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {matriculas.map(m => {
-                            const faltasArray = m.Frequencia || m.Frequencias || [];
-                            const novasFaltas = faltasArray.filter(f => f.presente === false || f.presente === 0 || f.presente === '0').length;
-                            const faltasCalc = (m.faltas_legado || 0) + novasFaltas;
-                            const reprovado = m.situacao === 'Reprovado por falta' || m.situacao === 'Reprovado por nota';
-                            const recuperacao = m.situacao === 'Em Recuperação';
-                            
-                            let bgColor = 'inherit';
-                            if (reprovado) bgColor = '#ffe6e6';
-                            if (recuperacao) bgColor = '#fff3cd';
-                            
-                            let textColor = 'inherit';
-                            if (reprovado) textColor = 'red';
-                            if (recuperacao) textColor = '#856404';
-
-                            const alunoObj = alunos.find(a => String(a.id) === String(m.aluno_id));
-                            const nomeAluno = alunoObj ? `${alunoObj.nome} ${alunoObj.sobrenome}` : `Aluno ${m.aluno_id}`;
-
-                            return (
-                            <tr key={m.id} style={{ backgroundColor: bgColor }}>
-                                <td>{nomeAluno}</td>
-                                <td style={{ color: reprovado ? 'red' : 'inherit', fontWeight: 'bold' }}>
-                                    {faltasCalc}
-                                </td>
-                                <td>
-                                    <input type="number" defaultValue={m.nota1} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota1', e.target.value)} style={{ width: '80px', padding: '0 8px', height: '40px' }} />
-                                </td>
-                                <td>
-                                    <input type="number" defaultValue={m.nota2} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota2', e.target.value)} style={{ width: '80px', padding: '0 8px', height: '40px' }} />
-                                </td>
-                                <td>
-                                    <input type="number" defaultValue={m.nota3} disabled={isFechado} onBlur={e => handleSalvarNota(m.id, 'nota3', e.target.value)} style={{ width: '80px', padding: '0 8px', height: '40px' }} />
-                                </td>
-                                <td>
-                                    <input 
-                                        type="number" 
-                                        defaultValue={m.nota_recuperacao} 
-                                        onBlur={e => handleSalvarNota(m.id, 'nota_recuperacao', e.target.value)} 
-                                        style={{ width: '80px', padding: '0 8px', height: '40px' }} 
-                                        disabled={isFechado || (!recuperacao && m.nota_recuperacao === null)} 
-                                        title={isFechado ? "Semestre encerrado" : (!recuperacao && m.nota_recuperacao === null ? "Aluno não está em recuperação" : "")}
-                                    />
-                                </td>
-                                <td>{m.media_final}</td>
-                                <td style={{ color: textColor, fontWeight: (reprovado || recuperacao) ? 'bold' : 'normal' }}>
-                                    {m.situacao}
-                                </td>
+            {matriculas.length === 0 && !isLoading ? (
+                <EmptyState 
+                    title="Nenhum aluno matriculado nesta turma" 
+                    description="Selecione um aluno na lista acima para efetuar a primeira matrícula."
+                />
+            ) : (
+                <TableWrapper>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Aluno</th>
+                                <th style={{ textAlign: 'center' }}>Faltas</th>
+                                <th style={{ textAlign: 'center' }}>N1</th>
+                                <th style={{ textAlign: 'center' }}>N2</th>
+                                <th style={{ textAlign: 'center' }}>N3</th>
+                                <th style={{ textAlign: 'center' }}>Recuperação</th>
+                                <th style={{ textAlign: 'center' }}>Média</th>
+                                <th style={{ textAlign: 'center' }}>Situação</th>
                             </tr>
-                            )
-                        })}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {matriculas.map(m => {
+                                const faltasArray = m.Frequencia || m.Frequencias || [];
+                                const novasFaltas = faltasArray.filter(f => f.presente === false || f.presente === 0 || f.presente === '0').length;
+                                const faltasCalc = (m.faltas_legado || 0) + novasFaltas;
+                                const reprovado = m.situacao === 'Reprovado por falta' || m.situacao === 'Reprovado por nota';
+                                const recuperacao = m.situacao === 'Em Recuperação';
+
+                                const alunoObj = alunos.find(a => String(a.id) === String(m.aluno_id));
+                                const nomeAluno = alunoObj ? `${alunoObj.nome} ${alunoObj.sobrenome}` : `Aluno #${m.aluno_id}`;
+
+                                return (
+                                <tr key={m.id}>
+                                    <td style={{ fontWeight: 600 }}>{nomeAluno}</td>
+                                    <td style={{ textAlign: 'center', fontWeight: 'bold', color: reprovado ? '#DC2626' : 'inherit' }}>
+                                        {faltasCalc}
+                                    </td>
+                                    <td style={{ textAlign: 'center' }}>
+                                        <GradeInput 
+                                            type="number" 
+                                            step="0.1"
+                                            defaultValue={m.nota1} 
+                                            disabled={isFechado} 
+                                            onBlur={e => handleSalvarNota(m.id, 'nota1', e.target.value)} 
+                                        />
+                                    </td>
+                                    <td style={{ textAlign: 'center' }}>
+                                        <GradeInput 
+                                            type="number" 
+                                            step="0.1"
+                                            defaultValue={m.nota2} 
+                                            disabled={isFechado} 
+                                            onBlur={e => handleSalvarNota(m.id, 'nota2', e.target.value)} 
+                                        />
+                                    </td>
+                                    <td style={{ textAlign: 'center' }}>
+                                        <GradeInput 
+                                            type="number" 
+                                            step="0.1"
+                                            defaultValue={m.nota3} 
+                                            disabled={isFechado} 
+                                            onBlur={e => handleSalvarNota(m.id, 'nota3', e.target.value)} 
+                                        />
+                                    </td>
+                                    <td style={{ textAlign: 'center' }}>
+                                        <GradeInput 
+                                            type="number" 
+                                            step="0.1"
+                                            defaultValue={m.nota_recuperacao} 
+                                            onBlur={e => handleSalvarNota(m.id, 'nota_recuperacao', e.target.value)} 
+                                            disabled={isFechado || (!recuperacao && m.nota_recuperacao === null)} 
+                                            title={isFechado ? "Semestre encerrado" : (!recuperacao && m.nota_recuperacao === null ? "Aluno não está em recuperação" : "")}
+                                        />
+                                    </td>
+                                    <td style={{ textAlign: 'center', fontWeight: 700, fontSize: '15px' }}>
+                                        {m.media_final ?? '-'}
+                                    </td>
+                                    <td style={{ textAlign: 'center' }}>
+                                        <StatusPill className={getStatusClass(m.situacao)}>
+                                            {m.situacao || 'Cursando'}
+                                        </StatusPill>
+                                    </td>
+                                </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </TableWrapper>
+            )}
         </Container>
     );
 }
