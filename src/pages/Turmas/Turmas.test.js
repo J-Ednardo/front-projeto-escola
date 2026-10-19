@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
@@ -15,6 +15,9 @@ describe('Turmas Page', () => {
     beforeEach(() => {
         axios.get.mockClear();
         axios.post.mockClear();
+        axios.put.mockClear();
+        axios.delete.mockClear();
+        jest.restoreAllMocks();
     });
 
     const mockApiResponses = () => {
@@ -138,5 +141,68 @@ describe('Turmas Page', () => {
         expect(await screen.findByText(/Turma T-ABERTA/i)).toBeInTheDocument();
         expect(screen.queryByText(/Turma T-OUTRO-PROF/i)).not.toBeInTheDocument();
         expect(screen.queryByText(/Turma T-FECHADA/i)).not.toBeInTheDocument();
+    });
+
+    it('visão ADMIN: deve permitir editar e excluir uma turma existente', async () => {
+        mockApiResponses();
+        jest.spyOn(window, 'confirm').mockImplementation(() => true);
+        axios.put.mockResolvedValueOnce({
+            data: {
+                id: 1,
+                codigo: 'T-ABERTA',
+                disciplina_id: 1,
+                periodo_id: 1,
+                professor_id: 20,
+                Professor: { id: 20, nome: 'Ana' }
+            }
+        });
+        axios.delete.mockResolvedValueOnce({});
+
+        const store = mockStore({
+            auth: {
+                user: { id: 1, perfil: 'ADMIN' },
+                isLoggedIn: true
+            }
+        });
+
+        render(
+            <Provider store={store}>
+                <BrowserRouter>
+                    <Turmas />
+                </BrowserRouter>
+            </Provider>
+        );
+
+        expect(await screen.findByText(/Turma T-ABERTA/i)).toBeInTheDocument();
+
+        // Editar turma T-ABERTA
+        fireEvent.click(screen.getByLabelText('Editar turma T-ABERTA'));
+        expect(screen.getByText(/Editando Turma #1/i)).toBeInTheDocument();
+
+        fireEvent.change(screen.getByLabelText(/Professor da Turma/i), {
+            target: { value: '20' }
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: /Salvar/i }));
+
+        await waitFor(() => {
+            expect(axios.put).toHaveBeenCalledWith('/turmas/1', {
+                codigo: 'T-ABERTA',
+                disciplina_id: 1,
+                periodo_id: 1,
+                professor_id: '20'
+            });
+        });
+
+        // Excluir turma T-ABERTA
+        fireEvent.click(screen.getByLabelText('Excluir turma T-ABERTA'));
+
+        await waitFor(() => {
+            expect(axios.delete).toHaveBeenCalledWith('/turmas/1');
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByText(/Turma T-ABERTA/i)).not.toBeInTheDocument();
+        });
     });
 });
