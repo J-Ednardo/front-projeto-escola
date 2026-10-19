@@ -3,10 +3,12 @@ import { get } from 'lodash';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
+import { FaCloudUploadAlt, FaArrowLeft } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
-import { Form, Title } from './styled';
+import { Form, Title, UploadBox } from './styled';
 import axios from '../../services/axios';
 import history from '../../services/history';
 import * as actions from '../../store/modules/auth/actions';
@@ -33,12 +35,13 @@ export default function Fotos({ match }) {
         };
 
         getData();
-    }, []);
+    }, [id]);
 
     const handleChange = async e => {
         const file = e.target.files[0];
-        const fotoURL = URL.createObjectURL(file);
+        if (!file) return;
 
+        const fotoURL = URL.createObjectURL(file);
         setFoto(fotoURL);
 
         const formData = new FormData();
@@ -48,14 +51,13 @@ export default function Fotos({ match }) {
         try {
             setIsLoading(true);
             
-            
             await axios.post('/fotos', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data', 
                 }
             });
 
-            toast.success('Foto enviada com sucesso')
+            toast.success('Foto enviada com sucesso');
             setIsLoading(false);
         } catch (err) {
             setIsLoading(false);
@@ -80,18 +82,33 @@ export default function Fotos({ match }) {
         <Container>
             <Loading isLoading={isLoading}/>
             
-            <Title>Fotos</Title>
+            <UploadBox>
+                <div className="upload-icon">
+                    <FaCloudUploadAlt size={44} />
+                </div>
+                <Title>Fotos</Title>
+                <p>Clique no círculo abaixo para selecionar uma nova foto para o aluno</p>
 
-            <Form>
-                <label htmlFor='foto' >
-                    {foto ? <img src={foto} alt="Foto" />: 'Selecionar'}
-                    <input type='file' id="foto" onChange={handleChange}/>
-                </label>
-            </Form>
+                <Form>
+                    <label htmlFor='foto'>
+                        {foto ? <img src={foto} alt="Foto" /> : (
+                            <>
+                                <span>Selecionar</span>
+                                <small style={{ fontSize: '11px', color: '#94A3B8', marginTop: '4px' }}>PNG, JPG até 5MB</small>
+                            </>
+                        )}
+                        <input type='file' id="foto" onChange={handleChange} accept="image/*" />
+                    </label>
+                </Form>
+
+                <Link to={`/aluno/${id}/edit`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, marginTop: '16px' }}>
+                    <FaArrowLeft size={12} /> Voltar para o aluno
+                </Link>
+            </UploadBox>
         </Container>
     );
 }
 
 Fotos.propTypes = {
     match: PropTypes.shape({}).isRequired,
-}
+};

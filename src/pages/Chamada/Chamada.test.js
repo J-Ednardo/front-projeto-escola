@@ -54,4 +54,45 @@ describe('Chamada Page', () => {
         const aulaConteudo = await screen.findByText(/Introdução/i);
         expect(aulaConteudo).toBeInTheDocument();
     });
+
+    it('deve exibir aviso e desabilitar botão de salvar se a data da aula já estiver registrada', async () => {
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        axios.get.mockImplementation((url) => {
+            if (url === '/matriculas') {
+                return Promise.resolve({
+                    data: [
+                        { id: 1, turma_id: 1, Aluno: { nome: 'João', sobrenome: 'Silva' } }
+                    ]
+                });
+            }
+            if (url === '/turmas/1') {
+                return Promise.resolve({
+                    data: { id: 1, PeriodoLetivo: { status: 'ABERTO' } }
+                });
+            }
+            if (url === '/turmas/1/aulas') {
+                return Promise.resolve({
+                    data: [
+                        { id: 10, data: todayStr, conteudo: 'Aula de Hoje' }
+                    ]
+                });
+            }
+        });
+
+        render(
+            <BrowserRouter>
+                <Chamada />
+            </BrowserRouter>
+        );
+
+        // Deve exibir o aviso de chamada já registrada
+        const alertMsg = await screen.findByText(/Já existe uma aula\/chamada registrada para a data/i);
+        expect(alertMsg).toBeInTheDocument();
+
+        // O botão deve estar desabilitado
+        const saveBtn = screen.getByRole('button', { name: /Chamada Já Registrada Nesta Data/i });
+        expect(saveBtn).toBeDisabled();
+    });
 });
+

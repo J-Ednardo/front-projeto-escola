@@ -1,13 +1,23 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { get } from 'lodash';
-import { FaUserCircle, FaEdit, FaWindowClose, FaExclamation } from 'react-icons/fa';
+import { FaUserCircle, FaEdit, FaTrashAlt, FaExclamation, FaPlus, FaSearch, FaFileAlt, FaHistory } from 'react-icons/fa';
 
 import { Container } from '../../styles/GlobalStyles';
-import { AlunoContainer, ProfilePicture, NovoAluno, FiltersContainer, PaginationContainer } from './styled';
+import { 
+    PageHeader,
+    AlunoContainer, 
+    ProfilePicture, 
+    NovoAluno, 
+    FiltersContainer, 
+    PaginationContainer,
+    ActionGroup,
+    ActionButton
+} from './styled';
 import axios from '../../services/axios';
 
 import Loading from '../../components/Loading';
+import EmptyState from '../../components/EmptyState';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 
@@ -35,7 +45,6 @@ export default function Alunos() {
 
             const response = await axios.get('/alunos', { params });
             
-            // Adjust to new API response format { data, meta }
             setAlunos(get(response, 'data.data', []));
             setMeta(get(response, 'data.meta', { totalPages: 1, total: 0 }));
             setIsLoading(false);
@@ -51,7 +60,7 @@ export default function Alunos() {
 
     const handleFilterSubmit = (e) => {
         e.preventDefault();
-        setPage(1); // Back to first page when filtering
+        setPage(1);
         getData(1);
     };
 
@@ -59,30 +68,23 @@ export default function Alunos() {
         setNomeFiltro('');
         setSituacaoFiltro('');
         setPage(1);
-        // getData will be called because page might change, 
-        // but to be sure we can just rely on the effect, or call it directly:
-        // Actually, since we use useCallback and useEffect, changing state triggers re-render, 
-        // but if page is already 1, effect won't re-run for filter clear unless we put filters in dependency array.
-        // It's safer to just let the effect handle it by putting getData in dependency array.
     };
 
     const handleDeleteAsk = e => {
         e.preventDefault();
-
         const exclamation = e.currentTarget.nextSibling;
-        exclamation.style.display = 'block';
-        e.currentTarget.style.display = 'none';
+        if (exclamation) {
+            exclamation.style.display = 'inline-flex';
+            e.currentTarget.style.display = 'none';
+        }
     };
 
-    const handleDelete = async (e, id, index) => {
+    const handleDelete = async (e, id) => {
         e.persist();
         try {
             setIsLoading(true);
-            await axios.delete(`/alunos/${id}`)
-            
-            // Re-fetch current page to handle pagination correctly after delete
+            await axios.delete(`/alunos/${id}`);
             getData(page);
-            
             toast.success('Aluno apagado com sucesso');
         } catch(err) {
             const status = get(err, 'response.status', []);
@@ -97,22 +99,35 @@ export default function Alunos() {
             
             setIsLoading(false);
         }
-    }
+    };
     
     return (
         <Container>
             <Loading isLoading={isLoading} />
 
-            <h1>Alunos</h1>
+            <PageHeader>
+                <div>
+                    <h1>Alunos</h1>
+                    <p className="subtitle">Gestão acadêmica e consulta de registros discentes</p>
+                </div>
+                {perfil !== 'ALUNO' && (
+                    <NovoAluno to="/aluno/">
+                        <FaPlus size={13} /> Novo aluno
+                    </NovoAluno>
+                )}
+            </PageHeader>
 
             <FiltersContainer onSubmit={handleFilterSubmit}>
-                <input 
-                    type="text" 
-                    placeholder="Filtrar por nome..." 
-                    aria-label="Filtrar por nome do aluno"
-                    value={nomeFiltro}
-                    onChange={(e) => setNomeFiltro(e.target.value)}
-                />
+                <div className="search-input-wrap">
+                    <FaSearch className="search-icon" />
+                    <input 
+                        type="text" 
+                        placeholder="Filtrar por nome..." 
+                        aria-label="Filtrar por nome do aluno"
+                        value={nomeFiltro}
+                        onChange={(e) => setNomeFiltro(e.target.value)}
+                    />
+                </div>
                 <select 
                     aria-label="Filtrar por situação do aluno"
                     value={situacaoFiltro} 
@@ -128,55 +143,76 @@ export default function Alunos() {
                 <button type="button" className="clear-btn" onClick={handleClearFilters}>Limpar</button>
             </FiltersContainer>
 
-            {perfil !== 'ALUNO' && (
-                <NovoAluno to="/aluno/">Novo aluno</NovoAluno>
+            {alunos.length === 0 && !isLoading ? (
+                <EmptyState 
+                    title="Nenhum aluno encontrado" 
+                    description="Não foram encontrados alunos correspondentes aos filtros aplicados. Tente ajustar os termos da pesquisa."
+                />
+            ) : (
+                <AlunoContainer>
+                    <table className="alunos-table">
+                        <thead>
+                            <tr>
+                                <th style={{ width: '60px' }}>Foto</th>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                {perfil !== 'ALUNO' && <th style={{ textAlign: 'right' }}>Ações</th>}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {alunos.map((aluno, index) => (
+                                <tr key={String(aluno.id)}>
+                                    <td>
+                                        <ProfilePicture>
+                                            {get(aluno, 'Fotos[0].url', false) ? (
+                                                <img src={aluno.Fotos[0].url} alt={aluno.nome} />
+                                            ) : (
+                                                <div className="avatar-placeholder">
+                                                    {(aluno.nome || 'A')[0].toUpperCase()}
+                                                </div>
+                                            )}
+                                        </ProfilePicture>
+                                    </td>
+                                    <td>
+                                        <span className="aluno-name">{aluno.nome} {aluno.sobrenome}</span>
+                                    </td>
+                                    <td>
+                                        <span className="aluno-email">{aluno.email}</span>
+                                    </td>
+                                    {perfil !== 'ALUNO' && (
+                                        <td style={{ textAlign: 'right', verticalAlign: 'middle' }}>
+                                            <ActionGroup>
+                                                <ActionButton as={Link} to={`/boletim/${aluno.id}`} title="Ver Boletim" className="btn-secondary">
+                                                    <FaFileAlt size={13} /> Boletim
+                                                </ActionButton>
+                                                <ActionButton as={Link} to={`/historico/${aluno.id}`} title="Ver Histórico Escolar" className="btn-secondary">
+                                                    <FaHistory size={13} /> Histórico
+                                                </ActionButton>
+                                                <ActionButton as={Link} to={`/aluno/${aluno.id}/edit`} aria-label={`Editar aluno ${aluno.nome}`} title="Editar" className="btn-icon">
+                                                    <FaEdit size={14}/>
+                                                </ActionButton>
+                                                <ActionButton as={Link} onClick={handleDeleteAsk} to={`/aluno/${aluno.id}/delete`} aria-label={`Solicitar exclusão do aluno ${aluno.nome}`} title="Excluir" className="btn-icon btn-danger-soft">
+                                                    <FaTrashAlt size={14} />
+                                                </ActionButton>
+
+                                                <button 
+                                                    className="delete-btn-invisible"
+                                                    aria-label={`Confirmar exclusão do aluno ${aluno.nome}`}
+                                                    style={{ display: 'none' }}
+                                                    onClick={e => handleDelete(e, aluno.id, index)}
+                                                    title="Clique para confirmar exclusão"
+                                                >
+                                                    <FaExclamation size={14} /> Confirmar
+                                                </button>
+                                            </ActionGroup>
+                                        </td>
+                                    )}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </AlunoContainer>
             )}
-
-            <AlunoContainer>
-                {alunos.length === 0 && !isLoading && (
-                    <p style={{ marginTop: '20px' }}>Nenhum aluno encontrado.</p>
-                )}
-                {alunos.map((aluno, index) => (
-                    <div key={String(aluno.id)}>
-                        <ProfilePicture>
-                            {get(aluno, 'Fotos[0].url', false) ? (
-                                <img src={aluno.Fotos[0].url} alt={aluno.nome}></img>
-                            ) : (
-                                <FaUserCircle size={36}/>
-                            )}
-                        </ProfilePicture>
-
-                        <span>{aluno.nome}</span>
-                        <span>{aluno.email}</span>
-
-                        {perfil !== 'ALUNO' && (
-                            <>
-                                <Link to={`/boletim/${aluno.id}`} title="Ver Boletim" style={{ marginLeft: '10px' }}>
-                                    Boletim
-                                </Link>
-                                <Link to={`/historico/${aluno.id}`} title="Ver Histórico Escolar" style={{ marginLeft: '10px', color: '#17a2b8' }}>
-                                    Histórico
-                                </Link>
-                                <Link to={`/aluno/${aluno.id}/edit`} style={{ marginLeft: '10px' }} aria-label={`Editar aluno ${aluno.nome}`}>
-                                    <FaEdit size={16}/>
-                                </Link>
-                                <Link onClick={handleDeleteAsk} to={`/aluno/${aluno.id}/delete`} aria-label={`Solicitar exclusão do aluno ${aluno.nome}`}>
-                                    <FaWindowClose size={16} />
-                                </Link>
-
-                                <button 
-                                    className="delete-btn-invisible"
-                                    aria-label={`Confirmar exclusão do aluno ${aluno.nome}`}
-                                    style={{ display: 'none', background: 'transparent', border: 'none', cursor: 'pointer' }}
-                                    onClick={e => handleDelete(e, aluno.id, index)}
-                                >
-                                    <FaExclamation size={16} color="red" />
-                                </button>
-                            </>
-                        )}
-                    </div>
-                ))}
-            </AlunoContainer>
 
             {meta.totalPages > 1 && (
                 <PaginationContainer>

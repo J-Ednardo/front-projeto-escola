@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { FaCalendarAlt, FaPlus } from 'react-icons/fa';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
+import EmptyState from '../../components/EmptyState';
 import axios from '../../services/axios';
+import { PageHeader, FormCard, StatusPill, ActionButton } from './styled';
 
 export default function Periodos() {
     const [periodos, setPeriodos] = useState([]);
@@ -75,44 +78,77 @@ export default function Periodos() {
     return (
         <Container>
             <Loading isLoading={isLoading} />
-            <h1>Gestão de Semestres</h1>
+            
+            <PageHeader>
+                <div>
+                    <h1>Gestão de Semestres</h1>
+                    <p className="subtitle">Configuração de períodos letivos e controle de trancamento de notas</p>
+                </div>
+            </PageHeader>
 
-            <form onSubmit={handleCreate} style={{ display: 'flex', gap: '15px', marginTop: '20px', marginBottom: '30px' }}>
-                <input type="number" placeholder="Ano (ex: 2026)" value={ano} onChange={e => setAno(e.target.value)} required style={{ flex: 1 }} />
-                <input type="number" placeholder="Semestre (1 ou 2)" value={semestre} onChange={e => setSemestre(e.target.value)} required min="1" max="2" style={{ flex: 1 }} />
-                <button type="submit">Criar Semestre</button>
-            </form>
+            <FormCard>
+                <h3>Criar Novo Semestre</h3>
+                <form onSubmit={handleCreate}>
+                    <input 
+                        type="number" 
+                        placeholder="Ano (ex: 2026)" 
+                        value={ano} 
+                        onChange={e => setAno(e.target.value)} 
+                        required 
+                    />
+                    <input 
+                        type="number" 
+                        placeholder="Semestre (1 ou 2)" 
+                        value={semestre} 
+                        onChange={e => setSemestre(e.target.value)} 
+                        required 
+                        min="1" 
+                        max="2" 
+                    />
+                    <button type="submit">
+                        <FaPlus size={12} /> Criar Semestre
+                    </button>
+                </form>
+            </FormCard>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Período Letivo</th>
-                        <th>Status</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {periodos.map(p => (
-                        <tr key={p.id}>
-                            <td>{p.nome}</td>
-                            <td style={{ fontWeight: 'bold', color: p.status === 'ABERTO' ? '#00B894' : '#D63031' }}>
-                                {p.status}
-                            </td>
-                            <td>
-                                <button 
-                                    onClick={() => handleToggleStatus(p.id, p.status)}
-                                    style={{ background: p.status === 'ABERTO' ? '#d63031' : '#00b894', height: '40px', padding: '0 16px', fontSize: '13px', margin: 'auto' }}
-                                >
-                                    {p.status === 'ABERTO' ? 'Encerrar' : 'Reabrir'}
-                                </button>
-                            </td>
+            <div style={{ overflowX: 'auto' }}>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Período Letivo</th>
+                            <th style={{ width: '160px', textAlign: 'center' }}>Status</th>
+                            <th style={{ width: '140px', textAlign: 'center' }}>Ação</th>
                         </tr>
-                    ))}
-                    {periodos.length === 0 && (
-                        <tr><td colSpan="3" style={{ textAlign: 'center' }}>Nenhum semestre cadastrado.</td></tr>
-                    )}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {periodos.map(p => (
+                            <tr key={p.id}>
+                                <td style={{ fontWeight: 700, fontSize: '15px' }}>{p.nome}</td>
+                                <td style={{ textAlign: 'center' }}>
+                                    <StatusPill className={p.status === 'ABERTO' ? 'aberto' : 'fechado'}>
+                                        {p.status}
+                                    </StatusPill>
+                                </td>
+                                <td style={{ textAlign: 'center' }}>
+                                    <ActionButton 
+                                        onClick={() => handleToggleStatus(p.id, p.status)}
+                                        className={p.status === 'ABERTO' ? 'encerrar' : 'reabrir'}
+                                    >
+                                        {p.status === 'ABERTO' ? 'Encerrar' : 'Reabrir'}
+                                    </ActionButton>
+                                </td>
+                            </tr>
+                        ))}
+                        {periodos.length === 0 && (
+                            <tr>
+                                <td colSpan="3" style={{ textAlign: 'center', padding: '32px' }}>
+                                    Nenhum semestre cadastrado.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </Container>
     );
 }

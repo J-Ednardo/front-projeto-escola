@@ -4,21 +4,20 @@ import { isEmail, isInt } from 'validator';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
-import { FaEdit, FaUserCircle } from 'react-icons/fa';
+import { FaEdit, FaUserCircle, FaCamera } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 import { Container } from '../../styles/GlobalStyles';
-import { Form, ProfilePicture } from './styled';
+import { PageHeader, Form, ProfilePicture } from './styled';
 import Loading from '../../components/Loading';
 import axios from '../../services/axios';
 import history from '../../services/history';
 import * as actions from '../../store/modules/auth/actions';
 
-
 export default function Aluno({ match }) {
     const dispatch = useDispatch();
     const perfil = useSelector(state => state.auth.user?.perfil);
-    const id =  get(match, 'params.id', '');
+    const id = get(match, 'params.id', '');
     const [nome, setNome] = useState('');
     const [sobrenome, setSobrenome] = useState('');
     const [email, setEmail] = useState('');
@@ -27,7 +26,7 @@ export default function Aluno({ match }) {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        if(!id) return
+        if(!id) return;
 
         async function getData() {
             try {
@@ -43,7 +42,6 @@ export default function Aluno({ match }) {
                 setIsLoading(false);
             } catch (err) {
                 setIsLoading(false);
-                const status = get(err, 'response.status', 0);
 
                 if (err.customError) {
                     toast.error(err.customError.mensagem);
@@ -76,7 +74,7 @@ export default function Aluno({ match }) {
         }
 
         if(!isInt(String(idade))) {
-            toast.error('Idade invalida')
+            toast.error('Idade invalida');
             formErrors = true;
         } else if (Number(idade) < 0 || Number(idade) > 100) {
             toast.error('Idade precisa estar entre 0 e 100');
@@ -127,71 +125,93 @@ export default function Aluno({ match }) {
 
             if(status === 401) dispatch(actions.loginFailure());
         }
-    }
+    };
     
     return (
         <Container>
             <Loading isLoading={isLoading} />
 
-            <h1>{id ? 'Editar aluno' : 'Novo aluno'}</h1>
+            <PageHeader>
+                <div>
+                    <h1>{id ? 'Editar aluno' : 'Novo aluno'}</h1>
+                    <p className="subtitle">
+                        {id 
+                            ? `Atualize as informações cadastrais de ${nome ? `${nome}${sobrenome ? ` ${sobrenome}` : ''}` : 'aluno'}` 
+                            : 'Preencha os dados para registrar um novo discente'
+                        }
+                    </p>
+                </div>
+            </PageHeader>
+
             {id && (
                 <ProfilePicture>
-                    {foto ? (
-                        <img src={foto} alt={nome}/>
-                    ) : (
-                        <FaUserCircle size={180} />
-                    )}
-                    {perfil !== 'ALUNO' && (
-                        <Link to={`/fotos/${id}`}>
-                            <FaEdit size={24} />
-                        </Link>
-                    )}
+                    <div className="avatar-wrapper">
+                        {foto ? (
+                            <img src={foto} alt={nome}/>
+                        ) : (
+                            <div className="placeholder-icon">
+                                <FaUserCircle size={80} />
+                            </div>
+                        )}
+                        {perfil !== 'ALUNO' && (
+                            <Link to={`/fotos/${id}`} title="Alterar foto do perfil">
+                                <FaCamera size={16} />
+                            </Link>
+                        )}
+                    </div>
                 </ProfilePicture>
             )}
+
             <Form onSubmit={handleSubmit}>
-                <label>
-                    Nome:
-                    <input 
-                        type="text"
-                        value={nome}
-                        onChange={e => setNome(e.target.value)}
-                        placeholder='Nome'
-                        disabled={perfil === 'ALUNO'}
-                    />
-                </label>
+                <div className="form-grid">
+                    <label>
+                        Nome
+                        <input 
+                            type="text"
+                            value={nome}
+                            onChange={e => setNome(e.target.value)}
+                            placeholder='Nome'
+                            disabled={perfil === 'ALUNO'}
+                            required
+                        />
+                    </label>
 
-                <label>
-                    Sobrenome:
-                    <input 
-                        type="text"
-                        value={sobrenome}
-                        onChange={e => setSobrenome(e.target.value)}
-                        placeholder='Sobrenome'
-                        disabled={perfil === 'ALUNO'}
-                    />
-                </label>
+                    <label>
+                        Sobrenome
+                        <input 
+                            type="text"
+                            value={sobrenome}
+                            onChange={e => setSobrenome(e.target.value)}
+                            placeholder='Sobrenome'
+                            disabled={perfil === 'ALUNO'}
+                            required
+                        />
+                    </label>
 
-                <label>
-                    E-mail:
-                    <input 
-                        type="text"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        placeholder='E-mail'
-                        disabled={perfil === 'ALUNO'}
-                    />
-                </label>
+                    <label>
+                        E-mail
+                        <input 
+                            type="email"
+                            value={email}
+                            onChange={e => setEmail(e.target.value)}
+                            placeholder='E-mail'
+                            disabled={perfil === 'ALUNO'}
+                            required
+                        />
+                    </label>
 
-                <label>
-                    Idade:
-                    <input 
-                        type="number"
-                        value={idade}
-                        onChange={e => setIdade(e.target.value)}
-                        placeholder='Idade'
-                        disabled={perfil === 'ALUNO'}
-                    />
-                </label>
+                    <label>
+                        Idade
+                        <input 
+                            type="number"
+                            value={idade}
+                            onChange={e => setIdade(e.target.value)}
+                            placeholder='Idade'
+                            disabled={perfil === 'ALUNO'}
+                            required
+                        />
+                    </label>
+                </div>
 
                 {perfil !== 'ALUNO' && (
                     <button type="submit">{id ? 'Editar Aluno' : 'Cadastrar Aluno'}</button>
@@ -203,4 +223,4 @@ export default function Aluno({ match }) {
 
 Aluno.propTypes = {
     match: PropTypes.shape({}).isRequired,
-}
+};

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
+import { FaChalkboardTeacher, FaBook, FaCalendarAlt, FaPlus, FaArrowRight } from 'react-icons/fa';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
+import EmptyState from '../../components/EmptyState';
 import axios from '../../services/axios';
+import { PageHeader, FormCard, TurmasGrid, TurmaCard, DiarioLink } from './styled';
 
 export default function Turmas() {
     const [turmas, setTurmas] = useState([]);
@@ -30,7 +33,6 @@ export default function Turmas() {
                 setDisciplinas(resDisc.data);
                 setPeriodos(resPer.data);
                 
-                // Filtra apenas os usuários que são professores (ou admins que lecionam)
                 const usersList = resUsers.data.data || [];
                 const profs = usersList.filter(u => u.perfil === 'PROFESSOR' || u.perfil === 'ADMIN');
                 setProfessores(profs);
@@ -56,6 +58,10 @@ export default function Turmas() {
                 professor_id: professorId
             });
             setTurmas([...turmas, data]);
+            setCodigo('');
+            setDisciplinaId('');
+            setPeriodoId('');
+            setProfessorId('');
             toast.success('Turma cadastrada!');
             setIsLoading(false);
         } catch(e) {
@@ -71,33 +77,96 @@ export default function Turmas() {
     return (
         <Container>
             <Loading isLoading={isLoading} />
-            <h1>Turmas</h1>
+            
+            <PageHeader>
+                <div>
+                    <h1>Turmas</h1>
+                    <p className="subtitle">Gestão de turmas ativas, alocação de docentes e diários de classe</p>
+                </div>
+            </PageHeader>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '15px', marginTop: '20px', marginBottom: '20px' }}>
-                <input type="text" placeholder="Código" aria-label="Código da Turma" value={codigo} onChange={e => setCodigo(e.target.value)} required style={{ flex: 1 }} />
-                <select aria-label="Disciplina da Turma" value={disciplinaId} onChange={e => setDisciplinaId(e.target.value)} required style={{ flex: 1 }}>
-                    <option value="">Disciplina</option>
-                    {disciplinas.map(d => <option key={d.id} value={d.id}>{d.nome}</option>)}
-                </select>
-                <select aria-label="Período da Turma" value={periodoId} onChange={e => setPeriodoId(e.target.value)} required style={{ flex: 1 }}>
-                    <option value="">Período</option>
-                    {periodos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
-                </select>
-                <select aria-label="Professor da Turma" value={professorId} onChange={e => setProfessorId(e.target.value)} required style={{ flex: 1 }}>
-                    <option value="">Professor</option>
-                    {professores.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
-                </select>
-                <button type="submit">Cadastrar</button>
-            </form>
+            <FormCard>
+                <h3>Cadastrar Nova Turma</h3>
+                <form onSubmit={handleSubmit}>
+                    <input 
+                        type="text" 
+                        placeholder="Código da Turma" 
+                        aria-label="Código da Turma" 
+                        value={codigo} 
+                        onChange={e => setCodigo(e.target.value)} 
+                        required 
+                    />
+                    <select 
+                        aria-label="Disciplina da Turma" 
+                        value={disciplinaId} 
+                        onChange={e => setDisciplinaId(e.target.value)} 
+                        required
+                    >
+                        <option value="">Selecione a Disciplina</option>
+                        {disciplinas.map(d => <option key={d.id} value={d.id}>{d.nome}</option>)}
+                    </select>
+                    <select 
+                        aria-label="Período da Turma" 
+                        value={periodoId} 
+                        onChange={e => setPeriodoId(e.target.value)} 
+                        required
+                    >
+                        <option value="">Selecione o Período</option>
+                        {periodos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                    </select>
+                    <select 
+                        aria-label="Professor da Turma" 
+                        value={professorId} 
+                        onChange={e => setProfessorId(e.target.value)} 
+                        required
+                    >
+                        <option value="">Selecione o Professor</option>
+                        {professores.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                    </select>
+                    <button type="submit">
+                        <FaPlus size={12} /> Cadastrar
+                    </button>
+                </form>
+            </FormCard>
 
-            <ul>
-                {turmas.map(t => (
-                    <li key={t.id} style={{ padding: '16px 0', borderBottom: '1px solid #E8E9ED', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: 500, color: '#2D3436' }}>Turma: {t.codigo} (Disc: {t.disciplina_id} / Período: {t.periodo_id})</span>
-                        <Link to={`/turmas/${t.id}/matriculas`} aria-label={`Ver diário da turma ${t.codigo}`} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: '#6C5CE7', color: '#fff', padding: '0 20px', height: '40px', borderRadius: '12px', fontSize: '14px', fontWeight: 600 }}>Ver Diário</Link>
-                    </li>
-                ))}
-            </ul>
+            {turmas.length === 0 && !isLoading ? (
+                <EmptyState 
+                    title="Nenhuma turma cadastrada" 
+                    description="Utilize o formulário acima para criar a primeira turma deste semestre letivo."
+                />
+            ) : (
+                <TurmasGrid>
+                    {turmas.map(t => {
+                        const disc = disciplinas.find(d => String(d.id) === String(t.disciplina_id));
+                        const per = periodos.find(p => String(p.id) === String(t.periodo_id));
+                        const prof = professores.find(u => String(u.id) === String(t.professor_id));
+
+                        return (
+                            <TurmaCard key={t.id}>
+                                <div>
+                                    <div className="turma-header">
+                                        <span className="turma-badge">Turma {t.codigo}</span>
+                                        <span className="periodo-pill">{per?.nome || `Período #${t.periodo_id}`}</span>
+                                    </div>
+                                    <div className="disciplina-nome">
+                                        {disc?.nome || `Disciplina #${t.disciplina_id}`}
+                                    </div>
+                                    <div className="meta-info">
+                                        <span>
+                                            <FaChalkboardTeacher size={13} color="#94A3B8" />
+                                            {prof?.nome ? `Prof. ${prof.nome}` : 'Docente a definir'}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <DiarioLink to={`/turmas/${t.id}/matriculas`} aria-label={`Ver diário da turma ${t.codigo}`}>
+                                    Ver Diário de Classe <FaArrowRight size={11} />
+                                </DiarioLink>
+                            </TurmaCard>
+                        );
+                    })}
+                </TurmasGrid>
+            )}
         </Container>
     );
 }

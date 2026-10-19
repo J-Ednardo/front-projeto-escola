@@ -2,8 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
+import EmptyState from '../../components/EmptyState';
 import axios from '../../services/axios';
-import { Form, PaginationContainer } from './styled';
+import { 
+    PageHeader, 
+    TableWrapper, 
+    RoleBadge, 
+    ActionButton, 
+    PaginationContainer 
+} from './styled';
 
 export default function Usuarios() {
     const [usuarios, setUsuarios] = useState([]);
@@ -52,7 +59,7 @@ export default function Usuarios() {
             setIsLoading(true);
             const body = { perfil };
             if (alunoId && perfil === 'ALUNO') body.aluno_id = Number(alunoId);
-            if (!alunoId || perfil !== 'ALUNO') body.aluno_id = null; // Backend might need handling to set null
+            if (!alunoId || perfil !== 'ALUNO') body.aluno_id = null;
 
             const { data } = await axios.put(`/users/${id}`, body);
             
@@ -67,71 +74,104 @@ export default function Usuarios() {
         }
     };
 
+    const getRoleClass = (p) => {
+        if (p === 'ADMIN') return 'admin';
+        if (p === 'PROFESSOR') return 'professor';
+        if (p === 'ALUNO') return 'aluno';
+        return 'user';
+    };
+
     return (
         <Container>
             <Loading isLoading={isLoading} />
-            <h1>Gerenciamento de Usuários</h1>
+            
+            <PageHeader>
+                <div>
+                    <h1>Gerenciamento de Usuários</h1>
+                    <p className="subtitle">Administração de perfis de acesso, permissões e vinculação com alunos</p>
+                </div>
+            </PageHeader>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Email</th>
-                        <th>Perfil</th>
-                        <th>Aluno ID</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {usuarios.map(u => (
-                        <tr key={u.id}>
-                            <td>{u.id}</td>
-                            <td>{u.nome}</td>
-                            <td>{u.email}</td>
-                            <td>
-                                {editingUserId === u.id ? (
-                                    <select value={perfil} onChange={e => setPerfil(e.target.value)}>
-                                        <option value="ALUNO">ALUNO</option>
-                                        <option value="PROFESSOR">PROFESSOR</option>
-                                        <option value="ADMIN">ADMIN</option>
-                                    </select>
-                                ) : (
-                                    <span style={{ 
-                                        background: u.perfil === 'ADMIN' ? '#ff7675' : (u.perfil === 'PROFESSOR' ? '#74b9ff' : '#55efc4'),
-                                        padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' 
-                                    }}>
-                                        {u.perfil}
-                                    </span>
-                                )}
-                            </td>
-                            <td>
-                                {editingUserId === u.id && perfil === 'ALUNO' ? (
-                                    <input 
-                                        type="number" 
-                                        value={alunoId} 
-                                        onChange={e => setAlunoId(e.target.value)} 
-                                        placeholder="ID do Aluno"
-                                        style={{ width: '80px', padding: '4px' }}
-                                    />
-                                ) : (
-                                    u.aluno_id || '-'
-                                )}
-                            </td>
-                            <td>
-                                {editingUserId === u.id ? (
-                                    <div style={{ display: 'flex', gap: '5px' }}>
-                                        <button onClick={(e) => handleSave(e, u.id)} style={{ background: '#00b894', padding: '6px 12px' }}>Salvar</button>
-                                        <button onClick={handleCancelEdit} style={{ background: '#d63031', padding: '6px 12px' }}>Cancelar</button>
-                                    </div>
-                                ) : (
-                                    <button onClick={() => handleEditClick(u)} style={{ background: '#0984e3', padding: '6px 12px' }}>Editar</button>
-                                )}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {usuarios.length === 0 && !isLoading ? (
+                <EmptyState 
+                    title="Nenhum usuário cadastrado" 
+                    description="Não existem registros de contas de usuários no sistema."
+                />
+            ) : (
+                <TableWrapper>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style={{ width: '80px' }}>ID</th>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th style={{ width: '150px' }}>Perfil</th>
+                                <th style={{ width: '130px' }}>Aluno ID</th>
+                                <th style={{ width: '160px', textAlign: 'right' }}>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {usuarios.map(u => (
+                                <tr key={u.id}>
+                                    <td style={{ color: '#94A3B8', fontWeight: 600 }}>#{u.id}</td>
+                                    <td style={{ fontWeight: 600 }}>{u.nome}</td>
+                                    <td>{u.email}</td>
+                                    <td>
+                                        {editingUserId === u.id ? (
+                                            <select 
+                                                value={perfil} 
+                                                onChange={e => setPerfil(e.target.value)}
+                                                style={{ height: '36px', padding: '0 8px', fontSize: '13px' }}
+                                            >
+                                                <option value="ALUNO">ALUNO</option>
+                                                <option value="PROFESSOR">PROFESSOR</option>
+                                                <option value="ADMIN">ADMIN</option>
+                                            </select>
+                                        ) : (
+                                            <RoleBadge className={getRoleClass(u.perfil)}>
+                                                {u.perfil}
+                                            </RoleBadge>
+                                        )}
+                                    </td>
+                                    <td>
+                                        {editingUserId === u.id && perfil === 'ALUNO' ? (
+                                            <input 
+                                                type="number" 
+                                                value={alunoId} 
+                                                onChange={e => setAlunoId(e.target.value)} 
+                                                placeholder="ID do Aluno"
+                                                style={{ width: '110px', height: '36px', padding: '0 8px', fontSize: '13px' }}
+                                            />
+                                        ) : (
+                                            u.aluno_id ? (
+                                                <span style={{ fontWeight: 600, color: '#2563EB' }}>
+                                                    Aluno #{u.aluno_id}
+                                                </span>
+                                            ) : '-'
+                                        )}
+                                    </td>
+                                    <td style={{ textAlign: 'right' }}>
+                                        {editingUserId === u.id ? (
+                                            <div style={{ display: 'inline-flex', gap: '8px' }}>
+                                                <ActionButton onClick={(e) => handleSave(e, u.id)} className="save">
+                                                    Salvar
+                                                </ActionButton>
+                                                <ActionButton onClick={handleCancelEdit} className="cancel">
+                                                    Cancelar
+                                                </ActionButton>
+                                            </div>
+                                        ) : (
+                                            <ActionButton onClick={() => handleEditClick(u)} className="edit">
+                                                Editar
+                                            </ActionButton>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </TableWrapper>
+            )}
 
             {meta.totalPages > 1 && (
                 <PaginationContainer>

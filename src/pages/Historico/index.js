@@ -3,8 +3,16 @@ import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
+import EmptyState from '../../components/EmptyState';
 import axios from '../../services/axios';
 import { useSelector } from 'react-redux';
+import { 
+    HeaderBox, 
+    KpiGrid, 
+    KpiCard, 
+    PeriodoBlock, 
+    StatusPill 
+} from './styled';
 
 export default function Historico() {
     const { id } = useParams();
@@ -35,7 +43,9 @@ export default function Historico() {
         return (
             <Container>
                 <h2>Acesso Restrito</h2>
-                <p>Sua conta de usuário ainda não está vinculada a nenhum registro de aluno. Por favor, contate a secretaria.</p>
+                <p style={{ marginTop: '12px', color: '#64748B' }}>
+                    Sua conta de usuário ainda não está vinculada a nenhum registro de aluno. Por favor, contate a secretaria.
+                </p>
             </Container>
         );
     }
@@ -44,60 +54,77 @@ export default function Historico() {
 
     const { aluno, estatisticas, periodos } = data;
 
+    const getStatusClass = (situacao) => {
+        if (!situacao) return 'cursando';
+        if (situacao === 'Aprovado') return 'aprovado';
+        if (situacao === 'Em Recuperação') return 'recuperacao';
+        if (situacao.includes('Reprovado')) return 'reprovado';
+        return 'cursando';
+    };
+
     return (
         <Container>
             <Loading isLoading={isLoading} />
             
-            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                <h1 style={{ textTransform: 'uppercase', letterSpacing: '2px', fontSize: '20px' }}>Histórico Escolar Oficial</h1>
-                <h2 style={{ color: '#636E72', marginTop: '10px', fontWeight: 500, fontSize: '16px' }}>{aluno.nome} {aluno.sobrenome}</h2>
-            </div>
+            <HeaderBox>
+                <span className="document-tag">Documento Oficial</span>
+                <h1>Histórico Escolar Oficial</h1>
+                <div className="student-name">{aluno.nome} {aluno.sobrenome}</div>
+            </HeaderBox>
 
-            <dl style={{ display: 'flex', justifyContent: 'space-around', background: '#F5F6FA', padding: '24px', borderRadius: '16px', marginBottom: '30px', border: '1px solid #E8E9ED' }}>
-                <div style={{ textAlign: 'center' }}>
-                    <dt style={{ fontSize: '12px', color: '#636E72', textTransform: 'uppercase', letterSpacing: '0.5px' }}>CH Integralizada</dt>
-                    <dd style={{ fontSize: '32px', fontWeight: 'bold', color: '#6C5CE7', margin: 0 }}>{estatisticas.carga_horaria_integralizada}h</dd>
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                    <dt style={{ fontSize: '12px', color: '#636E72', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Coef. Rendimento (CR)</dt>
-                    <dd style={{ fontSize: '32px', fontWeight: 'bold', color: '#00B894', margin: 0 }}>{estatisticas.coeficiente_rendimento}</dd>
-                </div>
-            </dl>
+            <KpiGrid>
+                <KpiCard>
+                    <div className="kpi-label">CH Integralizada</div>
+                    <div className="kpi-value primary">{estatisticas.carga_horaria_integralizada}h</div>
+                </KpiCard>
+                <KpiCard>
+                    <div className="kpi-label">Coeficiente de Rendimento (CR)</div>
+                    <div className="kpi-value success">{estatisticas.coeficiente_rendimento}</div>
+                </KpiCard>
+            </KpiGrid>
 
             {Object.keys(periodos).sort().reverse().map(periodo => (
-                <div key={periodo} style={{ marginBottom: '30px' }}>
-                    <h3 style={{ borderBottom: '2px solid #6C5CE7', paddingBottom: '8px', color: '#2D3436', fontSize: '16px' }}>
-                        Período Letivo: {periodo}
-                    </h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Disciplina</th>
-                                <th style={{ textAlign: 'center' }}>CH</th>
-                                <th style={{ textAlign: 'center' }}>Média Final</th>
-                                <th style={{ textAlign: 'center' }}>Faltas</th>
-                                <th style={{ textAlign: 'center' }}>Situação</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {periodos[periodo].map((m, idx) => (
-                                <tr key={idx}>
-                                    <td>{m.disciplina}</td>
-                                    <td style={{ textAlign: 'center' }}>{m.carga_horaria}h</td>
-                                    <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{m.media_final ?? '-'}</td>
-                                    <td style={{ textAlign: 'center' }}>{m.faltas}</td>
-                                    <td style={{ textAlign: 'center', fontWeight: 'bold', color: m.situacao === 'Aprovado' ? '#00B894' : (m.situacao === 'Em Recuperação' ? '#E1B12C' : '#D63031') }}>
-                                        {m.situacao || 'Cursando'}
-                                    </td>
+                <PeriodoBlock key={periodo}>
+                    <div className="periodo-header">
+                        <h3>Período Letivo: {periodo}</h3>
+                        <span className="periodo-tag">{periodos[periodo].length} {periodos[periodo].length === 1 ? 'disciplina' : 'disciplinas'}</span>
+                    </div>
+                    <div style={{ overflowX: 'auto' }}>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Disciplina</th>
+                                    <th style={{ textAlign: 'center', width: '100px' }}>CH</th>
+                                    <th style={{ textAlign: 'center', width: '120px' }}>Média Final</th>
+                                    <th style={{ textAlign: 'center', width: '100px' }}>Faltas</th>
+                                    <th style={{ textAlign: 'center', width: '140px' }}>Situação</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                {periodos[periodo].map((m, idx) => (
+                                    <tr key={idx}>
+                                        <td style={{ fontWeight: 600 }}>{m.disciplina}</td>
+                                        <td style={{ textAlign: 'center' }}>{m.carga_horaria}h</td>
+                                        <td style={{ textAlign: 'center', fontWeight: 700 }}>{m.media_final ?? '-'}</td>
+                                        <td style={{ textAlign: 'center' }}>{m.faltas}</td>
+                                        <td style={{ textAlign: 'center' }}>
+                                            <StatusPill className={getStatusClass(m.situacao)}>
+                                                {m.situacao || 'Cursando'}
+                                            </StatusPill>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </PeriodoBlock>
             ))}
             
             {Object.keys(periodos).length === 0 && (
-                <p style={{ textAlign: 'center', color: '#636E72' }}>O aluno ainda não possui registros no histórico.</p>
+                <EmptyState 
+                    title="Nenhum registro encontrado" 
+                    description="O aluno ainda não possui registros consolidados em seu histórico acadêmico."
+                />
             )}
         </Container>
     );
