@@ -20,11 +20,13 @@ function* loginRequest({ payload }) {
         const { perfil, aluno_id } = response.data.user;
         if (perfil === 'ALUNO') {
             if (aluno_id) {
-                history.push(`/aluno/${aluno_id}/edit`);
+                history.push(`/boletim/${aluno_id}`);
             } else {
                 toast.error('Seu usuário não possui um aluno vinculado.');
-                history.push('/'); // Ou desloga, mas vamos mandar pro root que vai deslogar por rota restrita ou mostrar tela branca
+                history.push('/register');
             }
+        } else if (perfil === 'PROFESSOR') {
+            history.push(payload.prevPath || '/turmas');
         } else {
             history.push(payload.prevPath || '/');
         }

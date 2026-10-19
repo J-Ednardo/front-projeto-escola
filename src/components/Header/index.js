@@ -70,10 +70,16 @@ export default function Header() {
                 </NavItem>
 
                 {perfil === 'ALUNO' && (
-                    <NavItem to={`/historico/${aluno_id}`} title="Meu Histórico" aria-label="Meu Histórico" className={isActive('/historico') ? 'active' : ''}>
-                        <FaBook size={20}/>
-                        <span className="tooltip">Meu Histórico</span>
-                    </NavItem>
+                    <>
+                        <NavItem to={`/boletim/${aluno_id}`} title="Meu Boletim" aria-label="Meu Boletim" className={isActive('/boletim') ? 'active' : ''}>
+                            <FaGraduationCap size={20}/>
+                            <span className="tooltip">Meu Boletim</span>
+                        </NavItem>
+                        <NavItem to={`/historico/${aluno_id}`} title="Meu Histórico" aria-label="Meu Histórico" className={isActive('/historico') ? 'active' : ''}>
+                            <FaBook size={20}/>
+                            <span className="tooltip">Meu Histórico</span>
+                        </NavItem>
+                    </>
                 )}
             </div>
             

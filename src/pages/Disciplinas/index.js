@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { FaBook, FaPlus, FaClock } from 'react-icons/fa';
+import { FaPlus, FaClock, FaEdit, FaTrashAlt, FaCheck, FaTimes } from 'react-icons/fa';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
 import EmptyState from '../../components/EmptyState';
@@ -11,6 +11,7 @@ export default function Disciplinas() {
     const [disciplinas, setDisciplinas] = useState([]);
     const [nome, setNome] = useState('');
     const [carga, setCarga] = useState('');
+    const [editingId, setEditingId] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -32,15 +33,48 @@ export default function Disciplinas() {
         e.preventDefault();
         try {
             setIsLoading(true);
-            const { data } = await axios.post('/disciplinas', { nome, carga_horaria: carga });
-            setDisciplinas([...disciplinas, data]);
+            if (editingId) {
+                const { data } = await axios.put(`/disciplinas/${editingId}`, { nome, carga_horaria: carga });
+                setDisciplinas(disciplinas.map(d => d.id === editingId ? data : d));
+                toast.success('Disciplina atualizada!');
+            } else {
+                const { data } = await axios.post('/disciplinas', { nome, carga_horaria: carga });
+                setDisciplinas([...disciplinas, data]);
+                toast.success('Disciplina cadastrada!');
+            }
             setNome('');
             setCarga('');
-            toast.success('Disciplina cadastrada!');
+            setEditingId(null);
             setIsLoading(false);
         } catch(e) {
             setIsLoading(false);
-            toast.error('Erro ao cadastrar disciplina');
+            toast.error(editingId ? 'Erro ao atualizar disciplina' : 'Erro ao cadastrar disciplina');
+        }
+    };
+
+    const handleEdit = (disc) => {
+        setEditingId(disc.id);
+        setNome(disc.nome);
+        setCarga(disc.carga_horaria);
+    };
+
+    const handleCancelEdit = () => {
+        setEditingId(null);
+        setNome('');
+        setCarga('');
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Deseja realmente excluir esta disciplina?')) return;
+        try {
+            setIsLoading(true);
+            await axios.delete(`/disciplinas/${id}`);
+            setDisciplinas(disciplinas.filter(d => d.id !== id));
+            toast.success('Disciplina removida!');
+            setIsLoading(false);
+        } catch (e) {
+            setIsLoading(false);
+            toast.error('Erro ao excluir disciplina');
         }
     };
 
@@ -56,7 +90,7 @@ export default function Disciplinas() {
             </PageHeader>
 
             <FormCard>
-                <h3>Cadastrar Nova Disciplina</h3>
+                <h3>{editingId ? `Editando Disciplina #${editingId}` : 'Cadastrar Nova Disciplina'}</h3>
                 <form onSubmit={handleSubmit}>
                     <input 
                         type="text" 
@@ -72,9 +106,20 @@ export default function Disciplinas() {
                         onChange={e => setCarga(e.target.value)} 
                         required 
                     />
-                    <button type="submit">
-                        <FaPlus size={12} /> Cadastrar
-                    </button>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        <button type="submit">
+                            {editingId ? <><FaCheck size={12} /> Salvar</> : <><FaPlus size={12} /> Cadastrar</>}
+                        </button>
+                        {editingId && (
+                            <button
+                                type="button"
+                                onClick={handleCancelEdit}
+                                style={{ background: '#64748B' }}
+                            >
+                                <FaTimes size={12} /> Cancelar
+                            </button>
+                        )}
+                    </div>
                 </form>
             </FormCard>
 
@@ -91,6 +136,7 @@ export default function Disciplinas() {
                                 <th style={{ width: '80px' }}>ID</th>
                                 <th>Nome da Disciplina</th>
                                 <th style={{ width: '160px', textAlign: 'center' }}>Carga Horária</th>
+                                <th style={{ width: '120px', textAlign: 'right' }}>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -111,6 +157,26 @@ export default function Disciplinas() {
                                             <FaClock size={11} /> {d.carga_horaria}h
                                         </span>
                                     </td>
+                                    <td style={{ textAlign: 'right' }}>
+                                        <div style={{ display: 'inline-flex', gap: '6px' }}>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleEdit(d)}
+                                                title="Editar disciplina"
+                                                style={{ padding: '6px 10px', background: '#F1F5F9', color: '#0F172A' }}
+                                            >
+                                                <FaEdit size={13} />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDelete(d.id)}
+                                                title="Excluir disciplina"
+                                                style={{ padding: '6px 10px', background: '#FEF2F2', color: '#DC2626' }}
+                                            >
+                                                <FaTrashAlt size={13} />
+                                            </button>
+                                        </div>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -120,3 +186,4 @@ export default function Disciplinas() {
         </Container>
     );
 }
+

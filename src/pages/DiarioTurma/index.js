@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { get } from 'lodash';
-import { FaUserPlus, FaCalendarCheck, FaExclamationTriangle } from 'react-icons/fa';
+import { FaUserPlus, FaCalendarCheck, FaExclamationTriangle, FaTrashAlt } from 'react-icons/fa';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
 import EmptyState from '../../components/EmptyState';
@@ -75,11 +75,34 @@ export default function DiarioTurma() {
         }
     };
 
+    const handleRemoverMatricula = async (matriculaId) => {
+        if (isFechado || !isAdmin) return;
+        if (!window.confirm('Deseja realmente remover a matrícula deste aluno nesta turma?')) return;
+        try {
+            setIsLoading(true);
+            await axios.delete(`/matriculas/${matriculaId}`);
+            setMatriculas(matriculas.filter(m => m.id !== matriculaId));
+            toast.success('Matrícula removida!');
+            setIsLoading(false);
+        } catch (e) {
+            setIsLoading(false);
+            const msg = e?.customError?.mensagem || e?.response?.data?.erro?.mensagem || 'Erro ao remover matrícula';
+            toast.error(msg);
+        }
+    };
+
     const handleSalvarNota = async (matriculaId, field, value) => {
         if (isFechado) return;
+        if (value !== '' && value !== null && value !== undefined) {
+            const num = Number(value);
+            if (Number.isNaN(num) || num < 0 || num > 10) {
+                toast.error('A nota deve ser um valor entre 0 e 10.');
+                return;
+            }
+        }
         try {
             const payload = {};
-            payload[field] = value;
+            payload[field] = value === '' ? null : value;
             const { data } = await axios.put(`/matriculas/${matriculaId}`, payload);
             
             setMatriculas(matriculas.map(m => m.id === matriculaId ? { ...m, ...data } : m));
@@ -97,6 +120,10 @@ export default function DiarioTurma() {
         if (situacao.includes('Reprovado')) return 'reprovado';
         return 'cursando';
     };
+
+    const alunosDisponiveis = alunos.filter(
+        a => !matriculas.some(m => String(m.aluno_id) === String(a.id))
+    );
 
     const totalAprovados = matriculas.filter(m => m.situacao === 'Aprovado').length;
     const totalRecuperacao = matriculas.filter(m => m.situacao === 'Em Recuperação').length;
@@ -151,7 +178,7 @@ export default function DiarioTurma() {
                 <FormRow onSubmit={handleMatricular}>
                     <select value={alunoId} onChange={e => setAlunoId(e.target.value)} required disabled={isFechado}>
                         <option value="">Selecione o Aluno para Matricular nesta Turma</option>
-                        {alunos.map(a => <option key={a.id} value={a.id}>{a.nome} {a.sobrenome}</option>)}
+                        {alunosDisponiveis.map(a => <option key={a.id} value={a.id}>{a.nome} {a.sobrenome}</option>)}
                     </select>
                     <button type="submit" disabled={isFechado}>
                         <FaUserPlus size={13} /> Matricular Aluno
@@ -181,6 +208,7 @@ export default function DiarioTurma() {
                                 <th style={{ textAlign: 'center' }}>Recuperação</th>
                                 <th style={{ textAlign: 'center' }}>Média</th>
                                 <th style={{ textAlign: 'center' }}>Situação</th>
+                                {isAdmin && !isFechado && <th style={{ textAlign: 'center', width: '70px' }}>Ação</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -192,7 +220,7 @@ export default function DiarioTurma() {
                                 const recuperacao = m.situacao === 'Em Recuperação';
 
                                 const alunoObj = alunos.find(a => String(a.id) === String(m.aluno_id));
-                                const nomeAluno = alunoObj ? `${alunoObj.nome} ${alunoObj.sobrenome}` : `Aluno #${m.aluno_id}`;
+                                const nomeAluno = m.Aluno ? `${m.Aluno.nome} ${m.Aluno.sobrenome}` : (alunoObj ? `${alunoObj.nome} ${alunoObj.sobrenome}` : `Aluno #${m.aluno_id}`);
 
                                 return (
                                 <tr key={m.id}>
@@ -204,6 +232,8 @@ export default function DiarioTurma() {
                                         <GradeInput 
                                             type="number" 
                                             step="0.1"
+                                            min="0"
+                                            max="10"
                                             defaultValue={m.nota1} 
                                             disabled={isFechado} 
                                             onBlur={e => handleSalvarNota(m.id, 'nota1', e.target.value)} 
@@ -213,6 +243,8 @@ export default function DiarioTurma() {
                                         <GradeInput 
                                             type="number" 
                                             step="0.1"
+                                            min="0"
+                                            max="10"
                                             defaultValue={m.nota2} 
                                             disabled={isFechado} 
                                             onBlur={e => handleSalvarNota(m.id, 'nota2', e.target.value)} 
@@ -222,6 +254,8 @@ export default function DiarioTurma() {
                                         <GradeInput 
                                             type="number" 
                                             step="0.1"
+                                            min="0"
+                                            max="10"
                                             defaultValue={m.nota3} 
                                             disabled={isFechado} 
                                             onBlur={e => handleSalvarNota(m.id, 'nota3', e.target.value)} 
@@ -231,6 +265,8 @@ export default function DiarioTurma() {
                                         <GradeInput 
                                             type="number" 
                                             step="0.1"
+                                            min="0"
+                                            max="10"
                                             defaultValue={m.nota_recuperacao} 
                                             onBlur={e => handleSalvarNota(m.id, 'nota_recuperacao', e.target.value)} 
                                             disabled={isFechado || (!recuperacao && m.nota_recuperacao === null)} 
@@ -245,6 +281,18 @@ export default function DiarioTurma() {
                                             {m.situacao || 'Cursando'}
                                         </StatusPill>
                                     </td>
+                                    {isAdmin && !isFechado && (
+                                        <td style={{ textAlign: 'center' }}>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoverMatricula(m.id)}
+                                                title="Remover matrícula do aluno"
+                                                style={{ padding: '6px 10px', background: '#FEF2F2', color: '#DC2626' }}
+                                            >
+                                                <FaTrashAlt size={12} />
+                                            </button>
+                                        </td>
+                                    )}
                                 </tr>
                                 );
                             })}
@@ -255,3 +303,4 @@ export default function DiarioTurma() {
         </Container>
     );
 }
+

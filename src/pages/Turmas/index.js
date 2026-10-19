@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
-import { FaChalkboardTeacher, FaCalendarCheck, FaPlus, FaArrowRight } from 'react-icons/fa';
+import { FaChalkboardTeacher, FaCalendarCheck, FaPlus, FaArrowRight, FaEdit, FaTrashAlt, FaCheck, FaTimes } from 'react-icons/fa';
 import { Container } from '../../styles/GlobalStyles';
 import Loading from '../../components/Loading';
 import EmptyState from '../../components/EmptyState';
@@ -21,6 +21,7 @@ export default function Turmas() {
     const [disciplinaId, setDisciplinaId] = useState('');
     const [periodoId, setPeriodoId] = useState('');
     const [professorId, setProfessorId] = useState('');
+    const [editingId, setEditingId] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -62,26 +63,65 @@ export default function Turmas() {
         if (!isAdmin) return;
         try {
             setIsLoading(true);
-            const { data } = await axios.post('/turmas', { 
+            const payload = { 
                 codigo, 
                 disciplina_id: disciplinaId,
                 periodo_id: periodoId,
                 professor_id: professorId
-            });
-            setTurmas([...turmas, data]);
+            };
+            if (editingId) {
+                const { data } = await axios.put(`/turmas/${editingId}`, payload);
+                setTurmas(turmas.map(t => t.id === editingId ? { ...t, ...data } : t));
+                toast.success('Turma atualizada!');
+            } else {
+                const { data } = await axios.post('/turmas', payload);
+                setTurmas([...turmas, data]);
+                toast.success('Turma cadastrada!');
+            }
             setCodigo('');
             setDisciplinaId('');
             setPeriodoId('');
             setProfessorId('');
-            toast.success('Turma cadastrada!');
+            setEditingId(null);
             setIsLoading(false);
         } catch(e) {
             setIsLoading(false);
             if (e.customError) {
                 toast.error(e.customError.mensagem);
             } else {
-                toast.error('Erro ao cadastrar turma');
+                toast.error(editingId ? 'Erro ao atualizar turma' : 'Erro ao cadastrar turma');
             }
+        }
+    };
+
+    const handleEdit = (turmaObj) => {
+        setEditingId(turmaObj.id);
+        setCodigo(turmaObj.codigo);
+        setDisciplinaId(turmaObj.disciplina_id);
+        setPeriodoId(turmaObj.periodo_id);
+        setProfessorId(turmaObj.professor_id);
+    };
+
+    const handleCancelEdit = () => {
+        setEditingId(null);
+        setCodigo('');
+        setDisciplinaId('');
+        setPeriodoId('');
+        setProfessorId('');
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Deseja realmente excluir esta turma?')) return;
+        try {
+            setIsLoading(true);
+            await axios.delete(`/turmas/${id}`);
+            setTurmas(turmas.filter(t => t.id !== id));
+            toast.success('Turma excluída!');
+            setIsLoading(false);
+        } catch (e) {
+            setIsLoading(false);
+            const msg = e?.customError?.mensagem || e?.response?.data?.erro?.mensagem || 'Erro ao excluir turma';
+            toast.error(msg);
         }
     };
 
@@ -113,7 +153,7 @@ export default function Turmas() {
 
             {isAdmin && (
                 <FormCard>
-                    <h3>Cadastrar Nova Turma</h3>
+                    <h3>{editingId ? `Editando Turma #${editingId}` : 'Cadastrar Nova Turma'}</h3>
                     <form onSubmit={handleSubmit}>
                         <input 
                             type="text" 
@@ -150,9 +190,20 @@ export default function Turmas() {
                             <option value="">Selecione o Professor</option>
                             {professores.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
                         </select>
-                        <button type="submit">
-                            <FaPlus size={12} /> Cadastrar
-                        </button>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <button type="submit">
+                                {editingId ? <><FaCheck size={12} /> Salvar</> : <><FaPlus size={12} /> Cadastrar</>}
+                            </button>
+                            {editingId && (
+                                <button
+                                    type="button"
+                                    onClick={handleCancelEdit}
+                                    style={{ background: '#64748B' }}
+                                >
+                                    <FaTimes size={12} /> Cancelar
+                                </button>
+                            )}
+                        </div>
                     </form>
                 </FormCard>
             )}
@@ -179,7 +230,31 @@ export default function Turmas() {
                                 <div>
                                     <div className="turma-header">
                                         <span className="turma-badge">Turma {t.codigo}</span>
-                                        <span className="periodo-pill">{t.PeriodoLetivo?.nome || per?.nome || `Período #${t.periodo_id}`}</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <span className="periodo-pill">{t.PeriodoLetivo?.nome || per?.nome || `Período #${t.periodo_id}`}</span>
+                                            {isAdmin && (
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleEdit(t)}
+                                                        title={`Editar turma ${t.codigo}`}
+                                                        aria-label={`Editar turma ${t.codigo}`}
+                                                        style={{ padding: '4px 8px', height: '26px', background: '#F1F5F9', color: '#0F172A' }}
+                                                    >
+                                                        <FaEdit size={11} />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDelete(t.id)}
+                                                        title={`Excluir turma ${t.codigo}`}
+                                                        aria-label={`Excluir turma ${t.codigo}`}
+                                                        style={{ padding: '4px 8px', height: '26px', background: '#FEF2F2', color: '#DC2626' }}
+                                                    >
+                                                        <FaTrashAlt size={11} />
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="disciplina-nome">
                                         {t.Disciplina?.nome || disc?.nome || `Disciplina #${t.disciplina_id}`}

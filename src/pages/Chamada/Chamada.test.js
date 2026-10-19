@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom';
 import axios from '../../services/axios';
@@ -15,6 +15,7 @@ describe('Chamada Page', () => {
     beforeEach(() => {
         axios.get.mockClear();
         axios.post.mockClear();
+        axios.put.mockClear();
     });
 
     it('deve carregar e renderizar os alunos e aulas anteriores', async () => {
@@ -93,6 +94,57 @@ describe('Chamada Page', () => {
         // O botão deve estar desabilitado
         const saveBtn = screen.getByRole('button', { name: /Chamada Já Registrada Nesta Data/i });
         expect(saveBtn).toBeDisabled();
+    });
+
+    it('deve permitir abrir o modal de frequência de uma aula anterior e retificar/abonar a presença de um aluno', async () => {
+        axios.get.mockImplementation((url) => {
+            if (url === '/matriculas') {
+                return Promise.resolve({
+                    data: [
+                        { id: 1, turma_id: 1, Aluno: { nome: 'João', sobrenome: 'Silva' } }
+                    ]
+                });
+            }
+            if (url === '/turmas/1') {
+                return Promise.resolve({
+                    data: { id: 1, PeriodoLetivo: { status: 'ABERTO' } }
+                });
+            }
+            if (url === '/turmas/1/aulas') {
+                return Promise.resolve({
+                    data: [
+                        {
+                            id: 10,
+                            data: '2026-09-01',
+                            conteudo: 'Introdução',
+                            Frequencias: [{ id: 99, matricula_id: 1, presente: true }]
+                        }
+                    ]
+                });
+            }
+        });
+        axios.put.mockResolvedValueOnce({ data: { id: 99, presente: false } });
+
+        render(
+            <BrowserRouter>
+                <Chamada />
+            </BrowserRouter>
+        );
+
+        const verChamadaBtn = await screen.findByRole('button', { name: /Ver Frequência/i });
+        fireEvent.click(verChamadaBtn);
+
+        const dialog = await screen.findByRole('dialog');
+        expect(dialog).toBeInTheDocument();
+        expect(within(dialog).getByText(/Frequência da Aula — 2026-09-01/i)).toBeInTheDocument();
+        expect(within(dialog).getByText('João Silva')).toBeInTheDocument();
+
+        const toggleBtn = within(dialog).getByRole('button', { name: /Presente/i });
+        fireEvent.click(toggleBtn);
+
+        await waitFor(() => {
+            expect(axios.put).toHaveBeenCalledWith('/frequencias/99', { presente: false });
+        });
     });
 });
 
