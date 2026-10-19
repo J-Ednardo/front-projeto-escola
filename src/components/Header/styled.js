@@ -5,13 +5,15 @@ import { colors, metrics } from '../../styles/theme';
 export const Nav = styled.nav`
     background: ${colors.sidebarBg};
     width: ${metrics.sidebarWidth};
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 24px 0;
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    bottom: 0;
     z-index: 100;
     border-right: 1px solid rgba(255, 255, 255, 0.06);
 
@@ -47,7 +49,8 @@ export const Nav = styled.nav`
     }
 
     .auth-action {
-        margin-top: 16px;
+        margin-top: auto;
+        padding-top: 16px;
         display: flex;
         flex-direction: column;
         align-items: center;

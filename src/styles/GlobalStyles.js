@@ -26,7 +26,8 @@ export default createGlobalStyle`
 
     #root {
         display: flex;
-        align-items: stretch;
+        align-items: flex-start;
+        padding-left: ${metrics.sidebarWidth};
     }
 
     h1, h2, h3, h4, h5, h6 {
