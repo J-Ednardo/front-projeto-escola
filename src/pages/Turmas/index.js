@@ -74,6 +74,13 @@ export default function Turmas() {
         }
     };
 
+    const periodosAbertos = periodos.filter(p => p.status !== 'FECHADO');
+    const turmasAtivas = turmas.filter(t => {
+        const per = periodos.find(p => String(p.id) === String(t.periodo_id));
+        const statusPeriodo = t.PeriodoLetivo?.status || per?.status;
+        return statusPeriodo !== 'FECHADO';
+    });
+
     return (
         <Container>
             <Loading isLoading={isLoading} />
@@ -112,7 +119,7 @@ export default function Turmas() {
                         required
                     >
                         <option value="">Selecione o Período</option>
-                        {periodos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                        {periodosAbertos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
                     </select>
                     <select 
                         aria-label="Professor da Turma" 
@@ -129,14 +136,14 @@ export default function Turmas() {
                 </form>
             </FormCard>
 
-            {turmas.length === 0 && !isLoading ? (
+            {turmasAtivas.length === 0 && !isLoading ? (
                 <EmptyState 
                     title="Nenhuma turma cadastrada" 
                     description="Utilize o formulário acima para criar a primeira turma deste semestre letivo."
                 />
             ) : (
                 <TurmasGrid>
-                    {turmas.map(t => {
+                    {turmasAtivas.map(t => {
                         const disc = disciplinas.find(d => String(d.id) === String(t.disciplina_id));
                         const per = periodos.find(p => String(p.id) === String(t.periodo_id));
                         const prof = professores.find(u => String(u.id) === String(t.professor_id));
@@ -146,10 +153,10 @@ export default function Turmas() {
                                 <div>
                                     <div className="turma-header">
                                         <span className="turma-badge">Turma {t.codigo}</span>
-                                        <span className="periodo-pill">{per?.nome || `Período #${t.periodo_id}`}</span>
+                                        <span className="periodo-pill">{t.PeriodoLetivo?.nome || per?.nome || `Período #${t.periodo_id}`}</span>
                                     </div>
                                     <div className="disciplina-nome">
-                                        {disc?.nome || `Disciplina #${t.disciplina_id}`}
+                                        {t.Disciplina?.nome || disc?.nome || `Disciplina #${t.disciplina_id}`}
                                     </div>
                                     <div className="meta-info">
                                         <span>
