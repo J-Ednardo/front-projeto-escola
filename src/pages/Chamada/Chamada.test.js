@@ -131,7 +131,7 @@ describe('Chamada Page', () => {
             </BrowserRouter>
         );
 
-        const verChamadaBtn = await screen.findByRole('button', { name: /Ver \/ Abonar Faltas/i });
+        const verChamadaBtn = await screen.findByRole('button', { name: /Ver Frequência/i });
         fireEvent.click(verChamadaBtn);
 
         const dialog = await screen.findByRole('dialog');

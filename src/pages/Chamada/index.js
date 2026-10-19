@@ -281,7 +281,7 @@ export default function Chamada() {
                                                     onClick={() => setAulaModalId(a.id)}
                                                     style={{ padding: '6px 12px', fontSize: '12px', background: '#EFF6FF', color: '#2563EB' }}
                                                 >
-                                                    Ver / Abonar Faltas ({freqs.length})
+                                                    Ver Frequência ({freqs.length})
                                                 </button>
                                             )}
                                         </td>
