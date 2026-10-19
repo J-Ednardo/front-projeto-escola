@@ -52,6 +52,7 @@ export default function DiarioTurma() {
 
     const handleMatricular = async (e) => {
         e.preventDefault();
+        if (isFechado) return;
         try {
             setIsLoading(true);
             const { data } = await axios.post('/matriculas', { 
@@ -64,11 +65,13 @@ export default function DiarioTurma() {
             setIsLoading(false);
         } catch(e) {
             setIsLoading(false);
-            toast.error('Erro ao matricular aluno');
+            const msg = e?.customError?.mensagem || e?.response?.data?.erro?.mensagem || 'Erro ao matricular aluno';
+            toast.error(msg);
         }
     };
 
     const handleSalvarNota = async (matriculaId, field, value) => {
+        if (isFechado) return;
         try {
             const payload = {};
             payload[field] = value;
@@ -77,7 +80,8 @@ export default function DiarioTurma() {
             setMatriculas(matriculas.map(m => m.id === matriculaId ? { ...m, ...data } : m));
             toast.success('Nota salva com sucesso');
         } catch(e) {
-            toast.error('Erro ao salvar nota');
+            const msg = e?.customError?.mensagem || e?.response?.data?.erro?.mensagem || 'Erro ao salvar nota';
+            toast.error(msg);
         }
     };
 
@@ -100,9 +104,11 @@ export default function DiarioTurma() {
                         {turma?.Disciplina?.nome || 'Disciplina'} • {turma?.PeriodoLetivo?.nome || 'Semestre'}
                     </p>
                 </div>
-                <ChamadaButton to={`/turmas/${id}/chamada`}>
-                    <FaCalendarCheck size={14} /> Fazer Chamada
-                </ChamadaButton>
+                {!isFechado && (
+                    <ChamadaButton to={`/turmas/${id}/chamada`}>
+                        <FaCalendarCheck size={14} /> Fazer Chamada
+                    </ChamadaButton>
+                )}
             </PageHeader>
 
             {isFechado && (

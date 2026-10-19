@@ -66,6 +66,7 @@ export default function Chamada() {
     });
 
     const handleToggle = (matriculaId) => {
+        if (isFechado) return;
         setPresencas({
             ...presencas,
             [matriculaId]: !presencas[matriculaId]
@@ -74,6 +75,7 @@ export default function Chamada() {
 
     const handleSalvarChamada = async (e) => {
         e.preventDefault();
+        if (isFechado) return;
         if (jaExisteAulaNaData) {
             toast.error('Já existe uma aula/chamada registrada para esta turma nesta data.');
             return;
