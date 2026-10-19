@@ -35,9 +35,9 @@ export default function Header() {
             </Link>
 
             <div className="nav-items">
-                <NavItem to="/" title="Início" aria-label="Início" className={isActive('/') ? 'active' : ''}>
+                <NavItem to="/" title={perfil === 'PROFESSOR' ? 'Consultar Alunos' : 'Início'} aria-label="Início" className={isActive('/') ? 'active' : ''}>
                     <FaHome size={20}/>
-                    <span className="tooltip">Início</span>
+                    <span className="tooltip">{perfil === 'PROFESSOR' ? 'Consultar Alunos' : 'Início'}</span>
                 </NavItem>
 
                 {perfil === 'ADMIN' && (
@@ -58,9 +58,9 @@ export default function Header() {
                 )}
 
                 {(perfil === 'ADMIN' || perfil === 'PROFESSOR') && (
-                    <NavItem to="/turmas" title="Turmas" aria-label="Turmas" className={isActive('/turmas') ? 'active' : ''}>
+                    <NavItem to="/turmas" title={perfil === 'PROFESSOR' ? 'Minhas Turmas' : 'Turmas'} aria-label="Turmas" className={isActive('/turmas') ? 'active' : ''}>
                         <FaUsers size={20}/>
-                        <span className="tooltip">Turmas</span>
+                        <span className="tooltip">{perfil === 'PROFESSOR' ? 'Minhas Turmas' : 'Turmas'}</span>
                     </NavItem>
                 )}
 
@@ -80,11 +80,13 @@ export default function Header() {
             <div className="spacer" style={{ flex: 1 }}></div>
 
             {isLoggedIn && (
-                <UserBadge title={`Conectado como ${user?.nome || 'Usuário'} (${perfil || 'Usuário'})`}>
+                <UserBadge $role={perfil} title={`Conectado como ${user?.nome || 'Usuário'} (${perfil || 'Usuário'})`}>
                     <div className="avatar">
                         {(user?.nome || 'U')[0].toUpperCase()}
                     </div>
-                    <span className="role-tag">{perfil || 'USER'}</span>
+                    <span className="role-tag">
+                        {perfil === 'ADMIN' ? 'ADMIN' : perfil === 'PROFESSOR' ? 'DOCENTE' : (perfil || 'USER')}
+                    </span>
                 </UserBadge>
             )}
 

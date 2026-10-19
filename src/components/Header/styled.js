@@ -132,8 +132,8 @@ export const UserBadge = styled.div`
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background: ${colors.sidebarSurface};
-        border: 2px solid rgba(255, 255, 255, 0.15);
+        background: ${props => props.$role === 'ADMIN' ? '#4F46E5' : props.$role === 'PROFESSOR' ? '#059669' : colors.sidebarSurface};
+        border: 2px solid rgba(255, 255, 255, 0.2);
         color: #FFFFFF;
         display: flex;
         align-items: center;
@@ -147,9 +147,10 @@ export const UserBadge = styled.div`
         font-weight: 700;
         letter-spacing: 0.05em;
         text-transform: uppercase;
-        color: ${colors.sidebarIcon};
-        background: rgba(255, 255, 255, 0.06);
+        color: ${props => props.$role === 'ADMIN' ? '#C7D2FE' : props.$role === 'PROFESSOR' ? '#A7F3D0' : colors.sidebarIcon};
+        background: ${props => props.$role === 'ADMIN' ? 'rgba(79, 70, 229, 0.25)' : props.$role === 'PROFESSOR' ? 'rgba(5, 150, 105, 0.25)' : 'rgba(255, 255, 255, 0.06)'};
         padding: 2px 6px;
         border-radius: 4px;
     }
 `;
+

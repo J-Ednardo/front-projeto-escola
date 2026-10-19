@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { get } from 'lodash';
 import { FaUserPlus, FaCalendarCheck, FaExclamationTriangle } from 'react-icons/fa';
 import { Container } from '../../styles/GlobalStyles';
@@ -12,6 +13,7 @@ import {
     ChamadaButton, 
     NoticeAlert, 
     FormRow, 
+    SummaryGrid,
     TableWrapper, 
     GradeInput, 
     StatusPill 
@@ -19,6 +21,9 @@ import {
 
 export default function DiarioTurma() {
     const { id } = useParams(); // turma_id
+    const perfil = useSelector(state => state.auth?.user?.perfil) || 'ADMIN';
+    const isAdmin = perfil === 'ADMIN';
+
     const [matriculas, setMatriculas] = useState([]);
     const [alunos, setAlunos] = useState([]);
     const [turma, setTurma] = useState(null);
@@ -52,7 +57,7 @@ export default function DiarioTurma() {
 
     const handleMatricular = async (e) => {
         e.preventDefault();
-        if (isFechado) return;
+        if (isFechado || !isAdmin) return;
         try {
             setIsLoading(true);
             const { data } = await axios.post('/matriculas', { 
@@ -93,6 +98,10 @@ export default function DiarioTurma() {
         return 'cursando';
     };
 
+    const totalAprovados = matriculas.filter(m => m.situacao === 'Aprovado').length;
+    const totalRecuperacao = matriculas.filter(m => m.situacao === 'Em Recuperação').length;
+    const totalReprovados = matriculas.filter(m => m.situacao && m.situacao.includes('Reprovado')).length;
+
     return (
         <Container>
             <Loading isLoading={isLoading} />
@@ -102,6 +111,7 @@ export default function DiarioTurma() {
                     <h1>Diário da Turma {turma?.codigo ? `(${turma.codigo})` : `#${id}`}</h1>
                     <p className="subtitle">
                         {turma?.Disciplina?.nome || 'Disciplina'} • {turma?.PeriodoLetivo?.nome || 'Semestre'}
+                        {turma?.Professor?.nome ? ` • Prof. ${turma.Professor.nome}` : ''}
                     </p>
                 </div>
                 {!isFechado && (
@@ -118,20 +128,45 @@ export default function DiarioTurma() {
                 </NoticeAlert>
             )}
 
-            <FormRow onSubmit={handleMatricular}>
-                <select value={alunoId} onChange={e => setAlunoId(e.target.value)} required disabled={isFechado}>
-                    <option value="">Selecione o Aluno para Matricular nesta Turma</option>
-                    {alunos.map(a => <option key={a.id} value={a.id}>{a.nome} {a.sobrenome}</option>)}
-                </select>
-                <button type="submit" disabled={isFechado}>
-                    <FaUserPlus size={13} /> Matricular Aluno
-                </button>
-            </FormRow>
+            <SummaryGrid>
+                <div className="kpi-card">
+                    <span className="kpi-label">Matriculados</span>
+                    <span className="kpi-value">{matriculas.length}</span>
+                </div>
+                <div className="kpi-card">
+                    <span className="kpi-label">Aprovados</span>
+                    <span className="kpi-value" style={{ color: '#16A34A' }}>{totalAprovados}</span>
+                </div>
+                <div className="kpi-card">
+                    <span className="kpi-label">Em Recuperação</span>
+                    <span className="kpi-value" style={{ color: '#D97706' }}>{totalRecuperacao}</span>
+                </div>
+                <div className="kpi-card">
+                    <span className="kpi-label">Reprovados</span>
+                    <span className="kpi-value" style={{ color: '#DC2626' }}>{totalReprovados}</span>
+                </div>
+            </SummaryGrid>
+
+            {isAdmin && (
+                <FormRow onSubmit={handleMatricular}>
+                    <select value={alunoId} onChange={e => setAlunoId(e.target.value)} required disabled={isFechado}>
+                        <option value="">Selecione o Aluno para Matricular nesta Turma</option>
+                        {alunos.map(a => <option key={a.id} value={a.id}>{a.nome} {a.sobrenome}</option>)}
+                    </select>
+                    <button type="submit" disabled={isFechado}>
+                        <FaUserPlus size={13} /> Matricular Aluno
+                    </button>
+                </FormRow>
+            )}
 
             {matriculas.length === 0 && !isLoading ? (
                 <EmptyState 
                     title="Nenhum aluno matriculado nesta turma" 
-                    description="Selecione um aluno na lista acima para efetuar a primeira matrícula."
+                    description={
+                        isAdmin
+                            ? 'Selecione um aluno na lista acima para efetuar a primeira matrícula.'
+                            : 'Aguarde a secretaria realizar a matrícula dos alunos nesta turma.'
+                    }
                 />
             ) : (
                 <TableWrapper>

@@ -22,9 +22,9 @@ export default function Routes () {
     return (
         <Switch>
             <MyRoute exact path="/" component={Alunos} isClosed allowedRoles={['ADMIN', 'PROFESSOR']} />
-            <MyRoute exact path="/aluno/:id/edit" component={Aluno} isClosed />
-            <MyRoute exact path="/aluno/" component={Aluno} isClosed allowedRoles={['ADMIN', 'PROFESSOR']} />
-            <MyRoute exact path="/fotos/:id" component={Fotos} isClosed allowedRoles={['ADMIN', 'PROFESSOR']} />
+            <MyRoute exact path="/aluno/:id/edit" component={Aluno} isClosed allowedRoles={['ADMIN']} />
+            <MyRoute exact path="/aluno/" component={Aluno} isClosed allowedRoles={['ADMIN']} />
+            <MyRoute exact path="/fotos/:id" component={Fotos} isClosed allowedRoles={['ADMIN']} />
             
             <MyRoute exact path="/boletim/:id?" component={Boletim} isClosed />
             <MyRoute exact path="/disciplinas" component={Disciplinas} isClosed allowedRoles={['ADMIN']} />

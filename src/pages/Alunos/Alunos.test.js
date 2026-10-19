@@ -71,4 +71,38 @@ describe('Alunos Page', () => {
         const prevButton = screen.getByText(/Anterior/i);
         expect(prevButton).toBeInTheDocument();
     });
+
+    it('deve ocultar botões de criar, editar e excluir aluno quando o perfil for PROFESSOR', async () => {
+        const profStore = mockStore({
+            auth: {
+                user: { id: 10, perfil: 'PROFESSOR' },
+                isLoggedIn: true
+            }
+        });
+
+        axios.get.mockResolvedValueOnce({
+            data: {
+                data: [
+                    { id: 1, nome: 'Aluno 1', sobrenome: 'Silva', email: 'a1@a.com', Fotos: [] }
+                ],
+                meta: { totalPages: 1, page: 1, total: 1 }
+            }
+        });
+
+        render(
+            <Provider store={profStore}>
+                <BrowserRouter>
+                    <Alunos />
+                </BrowserRouter>
+            </Provider>
+        );
+
+        expect(await screen.findByRole('heading', { name: /Consulta de Alunos/i })).toBeInTheDocument();
+        expect(screen.getByTitle(/Ver Boletim/i)).toBeInTheDocument();
+        expect(screen.getByTitle(/Ver Histórico Escolar/i)).toBeInTheDocument();
+        expect(screen.queryByText(/Novo aluno/i)).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(/Editar aluno/i)).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(/Solicitar exclusão do aluno/i)).not.toBeInTheDocument();
+    });
 });
+
