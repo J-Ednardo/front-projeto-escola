@@ -96,7 +96,7 @@ describe('Chamada Page', () => {
         expect(saveBtn).toBeDisabled();
     });
 
-    it('deve permitir expandir uma aula anterior e retificar a presença de um aluno', async () => {
+    it('deve permitir abrir o modal de frequência de uma aula anterior e retificar/abonar a presença de um aluno', async () => {
         axios.get.mockImplementation((url) => {
             if (url === '/matriculas') {
                 return Promise.resolve({
@@ -131,14 +131,15 @@ describe('Chamada Page', () => {
             </BrowserRouter>
         );
 
-        const verChamadaBtn = await screen.findByRole('button', { name: /Ver.*Chamada/i });
+        const verChamadaBtn = await screen.findByRole('button', { name: /Ver \/ Abonar Faltas/i });
         fireEvent.click(verChamadaBtn);
 
-        const alunoExpandido = await screen.findByText(/↳.*João Silva/i);
-        expect(alunoExpandido).toBeInTheDocument();
+        const dialog = await screen.findByRole('dialog');
+        expect(dialog).toBeInTheDocument();
+        expect(within(dialog).getByText(/Frequência da Aula — 2026-09-01/i)).toBeInTheDocument();
+        expect(within(dialog).getByText('João Silva')).toBeInTheDocument();
 
-        const rowExpandida = alunoExpandido.closest('tr');
-        const toggleBtn = within(rowExpandida).getByRole('button', { name: /Presente/i });
+        const toggleBtn = within(dialog).getByRole('button', { name: /Presente/i });
         fireEvent.click(toggleBtn);
 
         await waitFor(() => {

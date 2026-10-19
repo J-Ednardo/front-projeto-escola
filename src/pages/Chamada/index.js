@@ -13,7 +13,9 @@ import {
     AttendanceTableWrapper, 
     ToggleButton, 
     SaveButton, 
-    AulasAnterioresSection 
+    AulasAnterioresSection,
+    ModalOverlay,
+    ModalContent
 } from './styled';
 
 export default function Chamada() {
@@ -26,6 +28,7 @@ export default function Chamada() {
     const [turma, setTurma] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [aulas, setAulas] = useState([]);
+    const [aulaModalId, setAulaModalId] = useState(null);
 
     useEffect(() => {
         async function getData() {
@@ -110,8 +113,6 @@ export default function Chamada() {
         }
     };
 
-    const [aulaExpandedId, setAulaExpandedId] = useState(null);
-
     const handleToggleFrequenciaAnterior = async (aulaId, freq) => {
         if (isFechado) return;
         try {
@@ -129,6 +130,13 @@ export default function Chamada() {
             toast.error(msg);
         }
     };
+
+    const aulaSelecionadaModal = aulas.find(a => a.id === aulaModalId) || null;
+    const freqsModal = aulaSelecionadaModal
+        ? (aulaSelecionadaModal.Frequencias || aulaSelecionadaModal.Frequencia || [])
+        : [];
+    const totalPresentesModal = freqsModal.filter(f => f.presente).length;
+    const totalFaltasModal = freqsModal.length - totalPresentesModal;
 
     return (
         <Container>
@@ -245,59 +253,127 @@ export default function Chamada() {
                     <table>
                         <thead>
                             <tr>
-                                <th style={{ width: '160px' }}>Data</th>
+                                <th style={{ width: '140px' }}>Data</th>
                                 <th>Conteúdo</th>
-                                <th style={{ width: '180px', textAlign: 'right' }}>Frequências</th>
+                                <th style={{ width: '220px', textAlign: 'right' }}>Frequências</th>
                             </tr>
                         </thead>
                         <tbody>
                             {aulas.map(a => {
                                 const freqs = a.Frequencias || a.Frequencia || [];
-                                const isExpanded = aulaExpandedId === a.id;
+                                const presentesCount = freqs.filter(f => f.presente).length;
+                                const faltasCount = freqs.length - presentesCount;
                                 return (
-                                    <React.Fragment key={a.id}>
-                                        <tr>
-                                            <td style={{ fontWeight: 600 }}>{a.data}</td>
-                                            <td>{a.conteudo}</td>
-                                            <td style={{ textAlign: 'right' }}>
-                                                {freqs.length > 0 && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setAulaExpandedId(isExpanded ? null : a.id)}
-                                                        style={{ padding: '6px 12px', fontSize: '12px', background: '#EFF6FF', color: '#2563EB' }}
-                                                    >
-                                                        {isExpanded ? 'Ocultar Chamada' : `Ver Chamada (${freqs.length})`}
-                                                    </button>
-                                                )}
-                                            </td>
-                                        </tr>
-                                        {isExpanded && freqs.map(f => {
-                                            const mat = matriculas.find(m => String(m.id) === String(f.matricula_id));
-                                            const nomeAluno = mat?.Aluno ? `${mat.Aluno.nome} ${mat.Aluno.sobrenome}` : `Matrícula #${f.matricula_id}`;
-                                            return (
-                                                <tr key={`freq-${f.id}`} style={{ background: '#F8FAFC' }}>
-                                                    <td colSpan="2" style={{ paddingLeft: '28px', fontSize: '13px' }}>
-                                                        ↳ {nomeAluno}
-                                                    </td>
-                                                    <td style={{ textAlign: 'right' }}>
-                                                        <ToggleButton
-                                                            type="button"
-                                                            disabled={isFechado}
-                                                            onClick={() => handleToggleFrequenciaAnterior(a.id, f)}
-                                                            className={f.presente ? 'presente' : 'falta'}
-                                                        >
-                                                            {f.presente ? <><FaCheck size={11} /> Presente</> : <><FaTimes size={11} /> Falta</>}
-                                                        </ToggleButton>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </React.Fragment>
+                                    <tr key={a.id}>
+                                        <td style={{ fontWeight: 600 }}>{a.data}</td>
+                                        <td>
+                                            <div>{a.conteudo}</div>
+                                            {freqs.length > 0 && (
+                                                <small style={{ color: '#64748B', fontSize: '12px' }}>
+                                                    {presentesCount} presente(s) • {faltasCount} falta(s)
+                                                </small>
+                                            )}
+                                        </td>
+                                        <td style={{ textAlign: 'right' }}>
+                                            {freqs.length > 0 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setAulaModalId(a.id)}
+                                                    style={{ padding: '6px 12px', fontSize: '12px', background: '#EFF6FF', color: '#2563EB' }}
+                                                >
+                                                    Ver / Abonar Faltas ({freqs.length})
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
                                 );
                             })}
                         </tbody>
                     </table>
                 </AulasAnterioresSection>
+            )}
+
+            {aulaSelecionadaModal && (
+                <ModalOverlay onClick={() => setAulaModalId(null)}>
+                    <ModalContent
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="modal-chamada-title"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="modal-header">
+                            <div>
+                                <h3 id="modal-chamada-title">
+                                    Frequência da Aula — {aulaSelecionadaModal.data}
+                                </h3>
+                                <p>Conteúdo: {aulaSelecionadaModal.conteudo}</p>
+                            </div>
+                            <button
+                                type="button"
+                                className="close-btn"
+                                aria-label="Fechar modal de chamada"
+                                onClick={() => setAulaModalId(null)}
+                            >
+                                <FaTimes size={14} />
+                            </button>
+                        </div>
+
+                        <div className="modal-summary">
+                            <span className="badge-presentes">
+                                {totalPresentesModal} Presente(s)
+                            </span>
+                            <span className="badge-faltas">
+                                {totalFaltasModal} Falta(s)
+                            </span>
+                        </div>
+
+                        <div className="modal-body">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Aluno</th>
+                                        <th style={{ width: '150px', textAlign: 'center' }}>Situação na Aula</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {freqsModal.map(f => {
+                                        const mat = matriculas.find(m => String(m.id) === String(f.matricula_id));
+                                        const nomeAluno = mat?.Aluno
+                                            ? `${mat.Aluno.nome} ${mat.Aluno.sobrenome}`
+                                            : `Matrícula #${f.matricula_id}`;
+                                        return (
+                                            <tr key={`modal-freq-${f.id}`}>
+                                                <td style={{ fontWeight: 600 }}>
+                                                    {nomeAluno}
+                                                </td>
+                                                <td style={{ textAlign: 'center' }}>
+                                                    <ToggleButton
+                                                        type="button"
+                                                        disabled={isFechado}
+                                                        onClick={() => handleToggleFrequenciaAnterior(aulaSelecionadaModal.id, f)}
+                                                        className={f.presente ? 'presente' : 'falta'}
+                                                    >
+                                                        {f.presente ? <><FaCheck size={11} /> Presente</> : <><FaTimes size={11} /> Falta</>}
+                                                    </ToggleButton>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                onClick={() => setAulaModalId(null)}
+                                style={{ padding: '8px 18px', fontSize: '13px', background: '#475569' }}
+                            >
+                                Concluir
+                            </button>
+                        </div>
+                    </ModalContent>
+                </ModalOverlay>
             )}
         </Container>
     );
