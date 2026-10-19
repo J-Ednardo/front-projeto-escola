@@ -110,6 +110,26 @@ export default function Chamada() {
         }
     };
 
+    const [aulaExpandedId, setAulaExpandedId] = useState(null);
+
+    const handleToggleFrequenciaAnterior = async (aulaId, freq) => {
+        if (isFechado) return;
+        try {
+            const novoStatus = !freq.presente;
+            await axios.put(`/frequencias/${freq.id}`, { presente: novoStatus });
+            setAulas(aulas.map(a => {
+                if (a.id !== aulaId) return a;
+                const lista = a.Frequencias || a.Frequencia || [];
+                const novaLista = lista.map(f => f.id === freq.id ? { ...f, presente: novoStatus } : f);
+                return { ...a, Frequencias: novaLista, Frequencia: novaLista };
+            }));
+            toast.success('Frequência atualizada!');
+        } catch (e) {
+            const msg = e?.customError?.mensagem || e?.response?.data?.erro?.mensagem || 'Erro ao atualizar frequência';
+            toast.error(msg);
+        }
+    };
+
     return (
         <Container>
             <Loading isLoading={isLoading} />
@@ -227,15 +247,54 @@ export default function Chamada() {
                             <tr>
                                 <th style={{ width: '160px' }}>Data</th>
                                 <th>Conteúdo</th>
+                                <th style={{ width: '180px', textAlign: 'right' }}>Frequências</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {aulas.map(a => (
-                                <tr key={a.id}>
-                                    <td style={{ fontWeight: 600 }}>{a.data}</td>
-                                    <td>{a.conteudo}</td>
-                                </tr>
-                            ))}
+                            {aulas.map(a => {
+                                const freqs = a.Frequencias || a.Frequencia || [];
+                                const isExpanded = aulaExpandedId === a.id;
+                                return (
+                                    <React.Fragment key={a.id}>
+                                        <tr>
+                                            <td style={{ fontWeight: 600 }}>{a.data}</td>
+                                            <td>{a.conteudo}</td>
+                                            <td style={{ textAlign: 'right' }}>
+                                                {freqs.length > 0 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setAulaExpandedId(isExpanded ? null : a.id)}
+                                                        style={{ padding: '6px 12px', fontSize: '12px', background: '#EFF6FF', color: '#2563EB' }}
+                                                    >
+                                                        {isExpanded ? 'Ocultar Chamada' : `Ver Chamada (${freqs.length})`}
+                                                    </button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                        {isExpanded && freqs.map(f => {
+                                            const mat = matriculas.find(m => String(m.id) === String(f.matricula_id));
+                                            const nomeAluno = mat?.Aluno ? `${mat.Aluno.nome} ${mat.Aluno.sobrenome}` : `Matrícula #${f.matricula_id}`;
+                                            return (
+                                                <tr key={`freq-${f.id}`} style={{ background: '#F8FAFC' }}>
+                                                    <td colSpan="2" style={{ paddingLeft: '28px', fontSize: '13px' }}>
+                                                        ↳ {nomeAluno}
+                                                    </td>
+                                                    <td style={{ textAlign: 'right' }}>
+                                                        <ToggleButton
+                                                            type="button"
+                                                            disabled={isFechado}
+                                                            onClick={() => handleToggleFrequenciaAnterior(a.id, f)}
+                                                            className={f.presente ? 'presente' : 'falta'}
+                                                        >
+                                                            {f.presente ? <><FaCheck size={11} /> Presente</> : <><FaTimes size={11} /> Falta</>}
+                                                        </ToggleButton>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </React.Fragment>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </AulasAnterioresSection>

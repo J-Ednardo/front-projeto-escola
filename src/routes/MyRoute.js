@@ -21,10 +21,9 @@ export default function MyRoute({ component: Component, isClosed, allowedRoles, 
 
     if (allowedRoles && isLoggedIn) {
         if (!allowedRoles.includes(user.perfil)) {
-            // Se for ALUNO tentando acessar rota que não pode, joga pra edição dele
             if (user.perfil === 'ALUNO') {
                 if (user.aluno_id) {
-                    return <Redirect to={`/historico/${user.aluno_id}`} />;
+                    return <Redirect to={`/boletim/${user.aluno_id}`} />;
                 }
             }
             // Fallback genérico para quem não tem acesso
