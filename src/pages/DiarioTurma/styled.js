@@ -121,6 +121,37 @@ export const GradeInput = styled.input`
     }
 `;
 
+export const SummaryGrid = styled.div`
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+
+    .kpi-card {
+        background: #F8FAFC;
+        border: 1px solid ${colors.border};
+        border-radius: ${metrics.borderRadiusSm};
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .kpi-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: ${colors.textMuted};
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .kpi-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: ${colors.textTitle};
+        }
+    }
+`;
+
 export const StatusPill = styled.span`
     display: inline-block;
     padding: 4px 10px;
@@ -153,3 +184,4 @@ export const StatusPill = styled.span`
         border: 1px solid ${colors.border};
     }
 `;
+

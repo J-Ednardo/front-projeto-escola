@@ -107,10 +107,14 @@ export default function Alunos() {
 
             <PageHeader>
                 <div>
-                    <h1>Alunos</h1>
-                    <p className="subtitle">Gestão acadêmica e consulta de registros discentes</p>
+                    <h1>{perfil === 'PROFESSOR' ? 'Consulta de Alunos' : 'Alunos'}</h1>
+                    <p className="subtitle">
+                        {perfil === 'PROFESSOR'
+                            ? 'Acompanhamento de boletins e histórico escolar dos discentes'
+                            : 'Gestão acadêmica, cadastro e consulta de registros discentes'}
+                    </p>
                 </div>
-                {perfil !== 'ALUNO' && (
+                {perfil === 'ADMIN' && (
                     <NovoAluno to="/aluno/">
                         <FaPlus size={13} /> Novo aluno
                     </NovoAluno>
@@ -188,22 +192,26 @@ export default function Alunos() {
                                                 <ActionButton as={Link} to={`/historico/${aluno.id}`} title="Ver Histórico Escolar" className="btn-secondary">
                                                     <FaHistory size={13} /> Histórico
                                                 </ActionButton>
-                                                <ActionButton as={Link} to={`/aluno/${aluno.id}/edit`} aria-label={`Editar aluno ${aluno.nome}`} title="Editar" className="btn-icon">
-                                                    <FaEdit size={14}/>
-                                                </ActionButton>
-                                                <ActionButton as={Link} onClick={handleDeleteAsk} to={`/aluno/${aluno.id}/delete`} aria-label={`Solicitar exclusão do aluno ${aluno.nome}`} title="Excluir" className="btn-icon btn-danger-soft">
-                                                    <FaTrashAlt size={14} />
-                                                </ActionButton>
+                                                {perfil === 'ADMIN' && (
+                                                    <>
+                                                        <ActionButton as={Link} to={`/aluno/${aluno.id}/edit`} aria-label={`Editar aluno ${aluno.nome}`} title="Editar" className="btn-icon">
+                                                            <FaEdit size={14}/>
+                                                        </ActionButton>
+                                                        <ActionButton as={Link} onClick={handleDeleteAsk} to={`/aluno/${aluno.id}/delete`} aria-label={`Solicitar exclusão do aluno ${aluno.nome}`} title="Excluir" className="btn-icon btn-danger-soft">
+                                                            <FaTrashAlt size={14} />
+                                                        </ActionButton>
 
-                                                <button 
-                                                    className="delete-btn-invisible"
-                                                    aria-label={`Confirmar exclusão do aluno ${aluno.nome}`}
-                                                    style={{ display: 'none' }}
-                                                    onClick={e => handleDelete(e, aluno.id, index)}
-                                                    title="Clique para confirmar exclusão"
-                                                >
-                                                    <FaExclamation size={14} /> Confirmar
-                                                </button>
+                                                        <button 
+                                                            className="delete-btn-invisible"
+                                                            aria-label={`Confirmar exclusão do aluno ${aluno.nome}`}
+                                                            style={{ display: 'none' }}
+                                                            onClick={e => handleDelete(e, aluno.id, index)}
+                                                            title="Clique para confirmar exclusão"
+                                                        >
+                                                            <FaExclamation size={14} /> Confirmar
+                                                        </button>
+                                                    </>
+                                                )}
                                             </ActionGroup>
                                         </td>
                                     )}

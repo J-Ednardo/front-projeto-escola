@@ -121,6 +121,39 @@ export const TurmaCard = styled.div`
     }
 `;
 
+export const CardActions = styled.div`
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+
+    > * {
+        flex: 1;
+    }
+`;
+
+export const SecondaryLink = styled(Link)`
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #F8FAFC;
+    color: ${colors.textTitle};
+    border: 1px solid ${colors.border};
+    height: 40px;
+    border-radius: ${metrics.borderRadiusSm};
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-decoration: none;
+
+    &:hover {
+        background: #EFF6FF;
+        color: ${colors.primary};
+        border-color: #BFDBFE;
+        transform: translateY(-1px);
+    }
+`;
+
 export const DiarioLink = styled(Link)`
     display: inline-flex;
     align-items: center;
@@ -145,3 +178,4 @@ export const DiarioLink = styled(Link)`
         transform: scale(0.98);
     }
 `;
+
