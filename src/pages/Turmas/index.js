@@ -50,7 +50,6 @@ export default function Turmas() {
 
                 setIsLoading(false);
             } catch(e) {
-                console.error(e);
                 setIsLoading(false);
                 toast.error('Erro ao carregar dados');
             }
