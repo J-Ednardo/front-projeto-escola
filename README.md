@@ -3,6 +3,7 @@
 # 🖥️ Portal Acadêmico — Front-end de Gestão Escolar
 
 [![CI Frontend](https://img.shields.io/github/actions/workflow/status/J-Ednardo/front-projeto-escola/main.yml?branch=main&label=CI%20Frontend&logo=github)](https://github.com/J-Ednardo/front-projeto-escola/actions)
+[![Deploy](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel&logoColor=white)](https://front-projeto-escola.vercel.app)
 [![React](https://img.shields.io/badge/React-19.x-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![Redux](https://img.shields.io/badge/Redux%20%2B%20Saga-State-764ABC?logo=redux&logoColor=white)](https://redux.js.org/)
 [![Styled Components](https://img.shields.io/badge/Styled--Components-6.x-DB7093?logo=styled-components&logoColor=white)](https://styled-components.com/)
@@ -10,7 +11,7 @@
 
 Aplicação web em **React + Redux + Styled Components** que consome a [API REST de Gestão Acadêmica](https://github.com/J-Ednardo/API-REST), oferecendo interfaces e fluxos dedicados para **Secretaria (`ADMIN`)**, **Docentes (`PROFESSOR`)** e **Estudantes (`ALUNO`)**.
 
-[Repositório da API (Back-end)](https://github.com/J-Ednardo/API-REST) · [Contrato da API (`CONTRATO-API.md`)](../docs/CONTRATO-API.md) · [Reportar Bug](https://github.com/J-Ednardo/front-projeto-escola/issues)
+[🌐 Acessar Sistema (Vercel)](https://front-projeto-escola.vercel.app) · [Repositório da API (Back-end)](https://github.com/J-Ednardo/API-REST) · [Contrato da API (`CONTRATO-API.md`)](../docs/CONTRATO-API.md) · [Reportar Bug](https://github.com/J-Ednardo/front-projeto-escola/issues)
 
 </div>
 
@@ -29,6 +30,8 @@ Aplicação web em **React + Redux + Styled Components** que consome a [API REST
 ---
 
 ## 📖 Sobre o Projeto
+
+> 🌐 **Ambiente em Produção:** A aplicação está disponível para acesso online em [https://front-projeto-escola.vercel.app](https://front-projeto-escola.vercel.app).
 
 O **Portal Acadêmico** é a interface web do **Ecossistema Escola**. Ele foi projetado com navegação lateral fixa, feedback visual em tempo real, estados de carregamento/vazio e separação clara entre operações administrativas da secretaria, rotinas pedagógicas do professor e acompanhamento estudantil.
 
