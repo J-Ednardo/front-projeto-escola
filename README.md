@@ -10,7 +10,7 @@
 
 Aplicação web em **React + Redux + Styled Components** que consome a [API REST de Gestão Acadêmica](https://github.com/J-Ednardo/API-REST), oferecendo interfaces e fluxos dedicados para **Secretaria (`ADMIN`)**, **Docentes (`PROFESSOR`)** e **Estudantes (`ALUNO`)**.
 
-[Repositório da API (Back-end)](https://github.com/J-Ednardo/API-REST) · [Reportar Bug](https://github.com/J-Ednardo/front-projeto-escola/issues) · [Sistema]([https://github.com/J-Ednardo/front-projeto-escola/issues](https://front-projeto-escola.vercel.app)
+[Repositório da API (Back-end)](https://github.com/J-Ednardo/API-REST) · [Reportar Bug](https://github.com/J-Ednardo/front-projeto-escola/issues)
 
 </div>
 
